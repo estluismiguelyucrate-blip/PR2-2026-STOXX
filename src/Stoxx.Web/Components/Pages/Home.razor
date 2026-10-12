@@ -12,7 +12,7 @@ else if (CurrentUser is null)
         <section class="auth-card">
             <div class="brand-mark">S</div><p class="eyebrow">STOCKS X X X</p>
             <h1>@(SetupRequired ? "Configura el acceso" : "Iniciar sesión")</h1>
-            <p class="muted">@(SetupRequired ? SetupAuthorizationRequired ? "La primera cuenta requiere el código de autorización del propietario." : "Crea la primera cuenta administradora." : "Ingresa con tu cuenta para administrar la tienda.")</p>
+            <p class="muted">@(SetupRequired ? "Crea la primera cuenta administradora." : "Ingresa con tu cuenta para administrar la tienda.")</p>
             @if (!string.IsNullOrWhiteSpace(Notice)) { <div class="alert @(IsError ? "error" : "success")" role="alert">@Notice</div> }
             @if (SetupRequired)
             {
@@ -20,7 +20,6 @@ else if (CurrentUser is null)
                     <label>Nombre completo<input @bind="SetupName" maxlength="100" autocomplete="name" required /></label>
                     <label>Usuario<input @bind="SetupUserName" minlength="3" maxlength="40" autocomplete="username" required /></label>
                     <label>Contraseña<input @bind="SetupPassword" type="password" minlength="10" autocomplete="new-password" required /></label>
-                    @if (SetupAuthorizationRequired) { <label>Código de autorización<input @bind="SetupKey" type="password" autocomplete="off" required /></label> }
                     <p class="hint">Esta cuenta tendrá permisos de administrador. Luego podrás crear cuentas autorizadas.</p>
                     <button class="button primary" disabled="@Busy">Crear administrador</button>
                 </form>

@@ -43,7 +43,7 @@ El administrador puede crear cuentas de cajero y de inventario desde **Usuarios*
 
 ## Publicación en Internet
 
-El repositorio incluye `Dockerfile` y `render.yaml` para desplegar en Render con almacenamiento persistente. Al crear el servicio, configura `STOXX_INITIAL_SETUP_KEY` con un secreto aleatorio de al menos 32 caracteres. Solo la persona que tenga ese código podrá crear la primera cuenta administradora; después, el administrador autoriza el acceso creando usuarios desde la aplicación. La URL pública se muestra en el panel de Render cuando finalice el despliegue.
+El repositorio incluye `Dockerfile` y `render.yaml` para desplegar en Render con almacenamiento persistente. En el primer inicio, la primera persona que abra la aplicación podrá crear la cuenta administradora; luego, el administrador autoriza el acceso creando cuentas desde la aplicación. La URL pública se muestra en el panel de Render cuando finalice el despliegue.
 
 La interfaz web se entrega desde el mismo servidor ASP.NET Core y se adapta a celulares y computadoras. `localhost` solo sirve en el dispositivo donde corre localmente; para acceder por Internet, crea el servicio de Render desde el blueprint de este repositorio y configura las variables de entorno que solicita.
 

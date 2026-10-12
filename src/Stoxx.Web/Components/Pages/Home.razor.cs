@@ -9,8 +9,8 @@ namespace Stoxx.Web.Components.Pages;
 public class HomeBase : ComponentBase
 {
     [Inject] protected IJSRuntime JS { get; set; } = default!;
-    protected bool Ready, Busy, IsError, SetupRequired, SetupAuthorizationRequired;
-    protected string Notice = "", View = "inicio", LoginUserName = "", LoginPassword = "", SetupName = "", SetupUserName = "", SetupPassword = "", SetupKey = "", SaleSearch = "", ProductSearch = "", PaymentMethod = "Efectivo", ReportDate = DateOnly.FromDateTime(DateTime.Now).ToString("yyyy-MM-dd");
+    protected bool Ready, Busy, IsError, SetupRequired;
+    protected string Notice = "", View = "inicio", LoginUserName = "", LoginPassword = "", SetupName = "", SetupUserName = "", SetupPassword = "", SaleSearch = "", ProductSearch = "", PaymentMethod = "Efectivo", ReportDate = DateOnly.FromDateTime(DateTime.Now).ToString("yyyy-MM-dd");
     protected UserDto? CurrentUser;
     protected DashboardDto? Dashboard;
     protected CashDto? Cash;
@@ -39,7 +39,7 @@ public class HomeBase : ComponentBase
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
-        try { var status = await Get<StatusDto>("/auth/status"); SetupRequired = status.SetupRequired; SetupAuthorizationRequired = status.SetupAuthorizationRequired; if (status.Authenticated) { CurrentUser = status.User; View = "inicio"; Dashboard = await Get<DashboardDto>("/dashboard"); Cash = Dashboard.Cash ?? new CashDto(); } }
+        try { var status = await Get<StatusDto>("/auth/status"); SetupRequired = status.SetupRequired; if (status.Authenticated) { CurrentUser = status.User; View = "inicio"; Dashboard = await Get<DashboardDto>("/dashboard"); Cash = Dashboard.Cash ?? new CashDto(); } }
         catch (Exception ex) { SetNotice(ex.Message, true); }
         Ready = true; StateHasChanged();
     }
@@ -55,7 +55,7 @@ public class HomeBase : ComponentBase
     protected async Task Run(Func<Task> action) { Busy = true; Notice = ""; try { await action(); } catch (Exception ex) { SetNotice(ex.Message, true); } finally { Busy = false; } }
     protected void SetNotice(string text, bool error = false) { Notice = text; IsError = error; }
     protected async Task LoginAsync() => await Run(async () => { await Send<object>("/auth/login", HttpMethod.Post, new LoginRequest(LoginUserName, LoginPassword)); CurrentUser = (await Get<StatusDto>("/auth/status")).User; LoginPassword = ""; await ShowDashboardAsync(); });
-    protected async Task CreateAdminAsync() => await Run(async () => { await Send<object>("/auth/setup", HttpMethod.Post, new SetupRequest(SetupName, SetupUserName, SetupPassword, SetupKey)); SetupRequired = false; SetupPassword = SetupKey = ""; SetNotice("Administrador creado. Inicia sesión."); });
+    protected async Task CreateAdminAsync() => await Run(async () => { await Send<object>("/auth/setup", HttpMethod.Post, new SetupRequest(SetupName, SetupUserName, SetupPassword)); SetupRequired = false; SetupPassword = ""; SetNotice("Administrador creado. Inicia sesión."); });
     protected async Task ShowDashboardAsync() { View = "inicio"; if (CurrentUser is not null) await LoadDashboardAsync(); }
     protected async Task LoadDashboardAsync() { await Run(async () => { Dashboard = await Get<DashboardDto>("/dashboard"); Cash = Dashboard.Cash ?? new CashDto(); }); }
     protected async Task ShowSalesAsync() => await LoadView("ventas", async () => { SaleProducts = await Get<List<ProductDto>>("/products"); Cash = await Get<CashDto>("/cash"); });
@@ -86,7 +86,7 @@ public class HomeBase : ComponentBase
 }
 
 public sealed class UserDto { public int Id {get;set;} public string Name {get;set;}=""; public string UserName {get;set;}=""; public string Role {get;set;}=""; }
-public sealed class StatusDto { public bool SetupRequired {get;set;} public bool SetupAuthorizationRequired {get;set;} public bool Authenticated {get;set;} public UserDto? User {get;set;} }
+public sealed class StatusDto { public bool SetupRequired {get;set;} public bool Authenticated {get;set;} public UserDto? User {get;set;} }
 public sealed class DashboardDto { public decimal SalesTotal {get;set;} public int SalesCount {get;set;} public decimal GrossProfit {get;set;} public int ActiveProducts {get;set;} public int LowStockCount {get;set;} public List<ProductDto> LowStock {get;set;}=[]; public CashDto? Cash {get;set;} public List<RecentSale> RecentSales {get;set;}=[]; }
 public sealed class CashDto { public bool Open {get;set;} public decimal OpeningAmount {get;set;} public decimal ExpectedCash {get;set;} }
 public sealed class RecentSale { public int Id {get;set;} public DateTime CreatedAtUtc {get;set;} public string PaymentMethod {get;set;}=""; public decimal Total {get;set;} public string CashierName {get;set;}=""; }
