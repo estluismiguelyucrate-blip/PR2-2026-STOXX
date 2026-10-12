@@ -1,0 +1,11 @@
+.git
+.github
+.vs
+**/bin
+**/obj
+**/data
+**/Data
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/keys

@@ -19,9 +19,9 @@ El sistema reúne ventas, inventario, proveedores, compras y reportes para autom
 - Resumen diario, alertas de stock bajo, totales por forma de pago, costo de mercancía, ganancia bruta y productos vendidos.
 - Base de datos SQLite local. El catálogo empieza vacío para que el equipo introduzca sus datos reales.
 
-## Tecnologías elegidas para esta implementación
+## Tecnologías
 
-La presentación propone una aplicación web con C# y ASP.NET Core. Esta versión sigue esa propuesta y utiliza SQLite. El PDF contiene alternativas incompatibles en distintas secciones (Java, C++, escritorio y C#/ASP.NET Core web); el equipo debe confirmar cuál descripción conservar en la documentación académica.
+La aplicación utiliza C# con ASP.NET Core y Blazor Server para la interfaz y la lógica; JavaScript queda como un puente mínimo para las solicitudes al servidor. SQLite guarda los datos.
 
 ## Requisitos
 
@@ -41,13 +41,11 @@ Abre [http://localhost:5080](http://localhost:5080). En el primer inicio, crea l
 
 El administrador puede crear cuentas de cajero y de inventario desde **Usuarios**. La aplicación no trae usuarios, contraseñas ni productos precargados.
 
-## Acceso desde celulares y otras computadoras
+## Publicación en Internet
 
-El enlace `http://localhost:5080` solo abre la aplicación en la misma laptop donde se está ejecutando. Si se abre ese enlace desde un celular, `localhost` apunta al propio celular, no a la laptop.
+El repositorio incluye `Dockerfile` y `render.yaml` para desplegar en Render con almacenamiento persistente. Al crear el servicio, configura `STOXX_INITIAL_SETUP_KEY` con un secreto aleatorio de al menos 32 caracteres. Solo la persona que tenga ese código podrá crear la primera cuenta administradora; después, el administrador autoriza el acceso creando usuarios desde la aplicación. La URL pública se muestra en el panel de Render cuando finalice el despliegue.
 
-La interfaz se adapta a pantallas de celulares y computadoras. Sin embargo, para que otro dispositivo entre, la aplicación debe estar configurada para aceptar conexiones desde la red local y ambos dispositivos deben estar en la misma red. Para entrar desde Internet se necesita publicar la aplicación en un servicio de alojamiento. **Esta versión todavía no está publicada para acceso público.**
-
-Antes de publicar el sistema, el equipo debe definir cómo autorizará las cuentas. En el primer inicio, quien llegue a la pantalla de configuración puede crear la primera cuenta administradora; por eso, esa configuración debe completarse antes de exponer la aplicación públicamente.
+La interfaz web se entrega desde el mismo servidor ASP.NET Core y se adapta a celulares y computadoras. `localhost` solo sirve en el dispositivo donde corre localmente; para acceder por Internet, crea el servicio de Render desde el blueprint de este repositorio y configura las variables de entorno que solicita.
 
 ## Flujo de demostración
 

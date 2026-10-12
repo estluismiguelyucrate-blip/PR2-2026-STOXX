@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -11,7 +13,9 @@ using Stoxx.Web.Data;
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-var dataDirectory = Path.Combine(builder.Environment.ContentRootPath, "data");
+var dataDirectory = builder.Configuration["STOXX_DATA_DIR"];
+if (string.IsNullOrWhiteSpace(dataDirectory))
+    dataDirectory = Path.Combine(builder.Environment.ContentRootPath, "data");
 Directory.CreateDirectory(dataDirectory);
 var keyDirectory = Path.Combine(dataDirectory, "keys");
 Directory.CreateDirectory(keyDirectory);
@@ -23,6 +27,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
 builder.Services.AddScoped<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -60,6 +65,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+var setupAuthorizationRequired = !app.Environment.IsDevelopment();
+var setupAuthorizationKey = app.Configuration["STOXX_INITIAL_SETUP_KEY"];
 
 app.UseExceptionHandler(handler => handler.Run(async context =>
 {
@@ -71,10 +78,10 @@ app.UseExceptionHandler(handler => handler.Run(async context =>
     await context.Response.WriteAsJsonAsync(new { message = "Ocurrió un error interno. Revisa los datos e inténtalo nuevamente." });
 }));
 
-app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseAntiforgery();
 
 await using (var scope = app.Services.CreateAsyncScope())
 {
@@ -88,6 +95,7 @@ app.MapGet("/api/auth/status", async (AppDbContext db, ClaimsPrincipal user) =>
     return Results.Ok(new
     {
         setupRequired,
+        setupAuthorizationRequired,
         authenticated = user.Identity?.IsAuthenticated == true,
         user = user.Identity?.IsAuthenticated == true
             ? new { name = user.Identity.Name, role = user.FindFirstValue(ClaimTypes.Role) }
@@ -100,6 +108,17 @@ app.MapPost("/api/auth/setup", async (
     AppDbContext db,
     IPasswordHasher<AppUser> hasher) =>
 {
+    if (setupAuthorizationRequired)
+    {
+        if (string.IsNullOrEmpty(setupAuthorizationKey) || setupAuthorizationKey.Length < 32)
+            return Results.Problem("La autorización inicial no está configurada.", statusCode: StatusCodes.Status503ServiceUnavailable);
+
+        var providedKey = Encoding.UTF8.GetBytes(request.SetupKey ?? string.Empty);
+        var configuredKey = Encoding.UTF8.GetBytes(setupAuthorizationKey);
+        if (!CryptographicOperations.FixedTimeEquals(providedKey, configuredKey))
+            return Results.Json(new { message = "El código de autorización inicial no es válido." }, statusCode: StatusCodes.Status403Forbidden);
+    }
+
     var validation = ValidateCredentials(request.Name, request.UserName, request.Password);
     if (validation is not null) return Results.BadRequest(new { message = validation });
     if (await db.Users.AnyAsync()) return Results.Conflict(new { message = "La configuración inicial ya se completó." });
@@ -506,6 +525,9 @@ app.MapGet("/api/reports/daily", async ([FromQuery] DateOnly? date, AppDbContext
 }).RequireAuthorization(policy => policy.RequireRole(Roles.Admin, Roles.Cashier));
 
 app.MapGet("/api/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
+
+app.MapRazorComponents<Stoxx.Web.Components.App>()
+    .AddInteractiveServerRenderMode();
 
 app.Run();
 

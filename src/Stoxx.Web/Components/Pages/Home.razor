@@ -1,0 +1,109 @@
+@page "/"
+@inherits HomeBase
+<PageTitle>Stocks X X X | Ventas e inventario</PageTitle>
+
+@if (!Ready)
+{
+    <main class="auth-shell"><section class="auth-card"><div class="brand-mark">S</div><p class="eyebrow">STOCKS X X X</p><h1>Conectando...</h1><p class="muted">Cargando el sistema de ventas e inventario.</p></section></main>
+}
+else if (CurrentUser is null)
+{
+    <main class="auth-shell">
+        <section class="auth-card">
+            <div class="brand-mark">S</div><p class="eyebrow">STOCKS X X X</p>
+            <h1>@(SetupRequired ? "Configura el acceso" : "Iniciar sesión")</h1>
+            <p class="muted">@(SetupRequired ? SetupAuthorizationRequired ? "La primera cuenta requiere el código de autorización del propietario." : "Crea la primera cuenta administradora." : "Ingresa con tu cuenta para administrar la tienda.")</p>
+            @if (!string.IsNullOrWhiteSpace(Notice)) { <div class="alert @(IsError ? "error" : "success")" role="alert">@Notice</div> }
+            @if (SetupRequired)
+            {
+                <form class="stack" @onsubmit="CreateAdminAsync" @onsubmit:preventDefault="true">
+                    <label>Nombre completo<input @bind="SetupName" maxlength="100" autocomplete="name" required /></label>
+                    <label>Usuario<input @bind="SetupUserName" minlength="3" maxlength="40" autocomplete="username" required /></label>
+                    <label>Contraseña<input @bind="SetupPassword" type="password" minlength="10" autocomplete="new-password" required /></label>
+                    @if (SetupAuthorizationRequired) { <label>Código de autorización<input @bind="SetupKey" type="password" autocomplete="off" required /></label> }
+                    <p class="hint">Esta cuenta tendrá permisos de administrador. Luego podrás crear cuentas autorizadas.</p>
+                    <button class="button primary" disabled="@Busy">Crear administrador</button>
+                </form>
+            }
+            else
+            {
+                <form class="stack" @onsubmit="LoginAsync" @onsubmit:preventDefault="true">
+                    <label>Usuario<input @bind="LoginUserName" autocomplete="username" required /></label>
+                    <label>Contraseña<input @bind="LoginPassword" type="password" autocomplete="current-password" required /></label>
+                    <button class="button primary" disabled="@Busy">Entrar</button>
+                </form>
+            }
+        </section>
+    </main>
+}
+else
+{
+    <div class="app-shell">
+        <aside class="sidebar">
+            <a class="brand" href="/"><span class="brand-mark small">S</span><span>Stocks X X X<small>Ventas e inventario</small></span></a>
+            <nav aria-label="Navegación principal">
+                <button class="nav-link @(View == "inicio" ? "active" : "")" @onclick="ShowDashboardAsync"><span>◫</span> Resumen</button>
+                @if (CanSell) { <button class="nav-link @(View == "ventas" ? "active" : "")" @onclick="ShowSalesAsync"><span>＋</span> Registrar venta</button> }
+                @if (CanInventory) { <button class="nav-link @(View == "productos" ? "active" : "")" @onclick="ShowProductsAsync"><span>▦</span> Productos</button> }
+                @if (CanInventory) { <button class="nav-link @(View == "compras" ? "active" : "")" @onclick="ShowPurchasesAsync"><span>⇄</span> Compras y proveedores</button> }
+                @if (CanSell) { <button class="nav-link @(View == "reportes" ? "active" : "")" @onclick="ShowReportsAsync"><span>▤</span> Reportes</button> }
+                @if (IsAdmin) { <button class="nav-link @(View == "usuarios" ? "active" : "")" @onclick="ShowUsersAsync"><span>♙</span> Usuarios</button> }
+            </nav>
+            <div class="sidebar-foot"><span class="status-dot"></span> Datos guardados en el servidor</div>
+        </aside>
+        <main class="main-area">
+            <header class="topbar"><div><p class="eyebrow">SISTEMA DE VENTAS E INVENTARIO</p><h1>@PageTitle</h1></div><div class="user-menu"><div class="avatar">@Initial</div><div><strong>@CurrentUser.Name</strong><small>@RoleName</small></div><button class="button quiet" @onclick="LogoutAsync">Salir</button></div></header>
+            @if (!string.IsNullOrWhiteSpace(Notice)) { <div class="alert @(IsError ? "error" : "success")" role="status">@Notice</div> }
+
+            @if (View == "inicio")
+            {
+                <section>
+                    <div class="welcome-row"><div><h2>Resumen del día</h2><p class="muted">@TodayLabel</p></div><button class="button secondary" @onclick="LoadDashboardAsync">Actualizar</button></div>
+                    <div class="metric-grid"><article class="metric-card"><span>Ventas de hoy</span><strong>@Money(Dashboard?.SalesTotal ?? 0)</strong><small>@(Dashboard?.SalesCount ?? 0) ventas</small></article><article class="metric-card"><span>Ganancia bruta estimada</span><strong>@Money(Dashboard?.GrossProfit ?? 0)</strong><small>Precio de venta menos costo registrado</small></article><article class="metric-card"><span>Productos activos</span><strong>@(Dashboard?.ActiveProducts ?? 0)</strong><small>En el catálogo</small></article><article class="metric-card warning-metric"><span>Stock bajo</span><strong>@(Dashboard?.LowStockCount ?? 0)</strong><small>En o por debajo del mínimo</small></article></div>
+                    <div class="content-grid dashboard-grid">
+                        <article class="panel"><div class="panel-heading"><div><p class="eyebrow">CAJA</p><h3>@(Cash?.Open == true ? "Caja abierta" : "Caja cerrada")</h3></div><span class="pill @(Cash?.Open == true ? "good" : "")">@(Cash?.Open == true ? "Abierta" : "Cerrada")</span></div>
+                            @if (Cash?.Open == true) { <div class="cash-details"><div><span>Monto inicial</span><strong>@Money(Cash.OpeningAmount)</strong></div><div><span>Efectivo esperado</span><strong>@Money(Cash.ExpectedCash)</strong></div></div> }
+                            @if (CanSell && Cash?.Open != true) { <form class="inline-form" @onsubmit="OpenCashAsync" @onsubmit:preventDefault="true"><label>Monto inicial (Bs)<input type="number" min="0" step="0.01" @bind="OpeningAmount" required /></label><button class="button primary">Abrir caja</button></form> }
+                            @if (CanSell && Cash?.Open == true) { <form class="inline-form" @onsubmit="CloseCashAsync" @onsubmit:preventDefault="true"><label>Dinero contado (Bs)<input type="number" min="0" step="0.01" @bind="CountedAmount" required /></label><button class="button secondary">Cerrar caja</button></form> }
+                        </article>
+                        <article class="panel"><div class="panel-heading"><div><p class="eyebrow">INVENTARIO</p><h3>Revisar stock</h3></div></div><div class="compact-list">@if (Dashboard?.LowStock is { Count: > 0 }) { @foreach (var p in Dashboard.LowStock) { <div class="compact-row"><div><strong>@p.Name</strong><small>Código @p.Code · mínimo @p.MinimumStock</small></div><span class="pill warn">@p.Stock disponibles</span></div> } } else { <div class="empty-state">No hay alertas de stock bajo.</div> }</div></article>
+                    </div>
+                    <article class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">ACTIVIDAD</p><h3>Ventas recientes</h3></div></div><div class="table-wrap"><table><thead><tr><th>Venta</th><th>Hora</th><th>Atendió</th><th>Pago</th><th class="numeric">Total</th></tr></thead><tbody>@if (Dashboard?.RecentSales is { Count: > 0 }) { @foreach (var sale in Dashboard.RecentSales) { <tr><td>#@sale.Id</td><td>@ShortDate(sale.CreatedAtUtc)</td><td>@sale.CashierName</td><td>@sale.PaymentMethod</td><td class="numeric">@Money(sale.Total)</td></tr> } } else { <tr><td colspan="5" class="empty-state">Todavía no hay ventas.</td></tr> }</tbody></table></div></article>
+                </section>
+            }
+            else if (View == "ventas")
+            {
+                <section><div class="welcome-row"><div><h2>Nueva venta</h2><p class="muted">El stock se descuenta al confirmar la venta.</p></div><span class="pill @(Cash?.Open == true ? "good" : "warn")">@(Cash?.Open == true ? "Caja abierta" : "Caja cerrada")</span></div>
+                    <div class="content-grid sales-grid"><article class="panel"><div class="panel-heading"><div><p class="eyebrow">CATÁLOGO</p><h3>Agregar productos</h3></div></div><input type="search" placeholder="Buscar producto" @bind="SaleSearch" @bind:event="oninput" />
+                        <div class="product-pick-list">@foreach (var p in SaleProducts.Where(ProductMatches)) { <div class="pick-item"><div><strong>@p.Name</strong><small>@p.Code · @Money(p.UnitPrice) · stock @p.Stock</small></div><button class="button secondary" @onclick="() => AddToCart(p)">Agregar</button></div> }</div>
+                    </article><article class="panel"><div class="panel-heading"><div><p class="eyebrow">COBRO</p><h3>Detalle de venta</h3></div></div><div class="cart-list">@foreach (var line in Cart) { <div class="cart-item"><div><strong>@line.Name</strong><small>@Money(line.UnitPrice)</small></div><div class="quantity-control"><button @onclick="() => ChangeQuantity(line, -1)">−</button><span>@line.Quantity</span><button @onclick="() => ChangeQuantity(line, 1)">+</button></div><span class="cart-item-price">@Money(line.UnitPrice * line.Quantity)</span></div> }</div><div class="cart-total"><span>Total</span><strong>@Money(CartTotal)</strong></div><form class="stack" @onsubmit="CompleteSaleAsync" @onsubmit:preventDefault="true"><label>Forma de pago<select @bind="PaymentMethod"><option>Efectivo</option><option>QR</option></select></label><button class="button primary full" disabled="@(Busy || Cart.Count == 0 || Cash?.Open != true)">Confirmar venta</button></form></article></div>
+                </section>
+            }
+            else if (View == "productos")
+            {
+                <section><div class="welcome-row"><div><h2>Productos e inventario</h2><p class="muted">Administra precios, cantidades y alertas de stock.</p></div></div><div class="content-grid inventory-grid">
+                    <article class="panel form-panel"><div class="panel-heading"><div><p class="eyebrow">CATÁLOGO</p><h3>@(ProductForm.Id == 0 ? "Nuevo producto" : "Editar producto")</h3></div></div><form class="stack" @onsubmit="SaveProductAsync" @onsubmit:preventDefault="true"><label>Código<input @bind="ProductForm.Code" maxlength="50" required /></label><label>Nombre<input @bind="ProductForm.Name" maxlength="160" required /></label><label>Categoría<input @bind="ProductForm.Category" maxlength="100" /></label><div class="two-fields"><label>Costo (Bs)<input type="number" min="0" step="0.01" @bind="ProductForm.CostPrice" required /></label><label>Precio venta (Bs)<input type="number" min="0.01" step="0.01" @bind="ProductForm.UnitPrice" required /></label></div><div class="two-fields"><label>Stock<input type="number" min="0" step="1" @bind="ProductForm.Stock" required /></label><label>Stock mínimo<input type="number" min="0" step="1" @bind="ProductForm.MinimumStock" required /></label></div><div class="button-row"><button class="button primary">Guardar producto</button>@if (ProductForm.Id != 0) { <button class="button quiet" type="button" @onclick="ResetProductForm">Cancelar</button> }</div></form></article>
+                    <article class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">INVENTARIO</p><h3>Productos registrados</h3></div><input class="search-label" type="search" placeholder="Buscar" @bind="ProductSearch" @bind:event="oninput" /></div><div class="table-wrap"><table><thead><tr><th>Producto</th><th>Código</th><th class="numeric">Precio</th><th class="numeric">Stock</th><th>Estado</th><th></th></tr></thead><tbody>@foreach (var p in Products.Where(ProductMatchesSearch)) { <tr><td>@p.Name</td><td>@p.Code</td><td class="numeric">@Money(p.UnitPrice)</td><td class="numeric">@p.Stock</td><td><span class="stock-badge @(p.LowStock ? "low" : "")">@(p.LowStock ? "Bajo" : "Disponible")</span></td><td><button class="table-action" @onclick="() => EditProduct(p)">Editar</button>@if (p.Active) { <button class="table-action danger" @onclick="() => ArchiveProductAsync(p)">Desactivar</button> }</td></tr> }</tbody></table></div></article>
+                </div></section>
+            }
+            else if (View == "compras")
+            {
+                <section><div class="welcome-row"><div><h2>Compras y proveedores</h2><p class="muted">Registra recepciones para aumentar el inventario.</p></div></div><div class="content-grid purchase-grid">
+                    <article class="panel"><div class="panel-heading"><div><p class="eyebrow">PROVEEDORES</p><h3>Agregar proveedor</h3></div></div><form class="stack" @onsubmit="SaveSupplierAsync" @onsubmit:preventDefault="true"><label>Nombre<input @bind="SupplierForm.Name" required maxlength="160" /></label><label>Contacto<input @bind="SupplierForm.ContactName" maxlength="120" /></label><div class="two-fields"><label>Teléfono<input @bind="SupplierForm.Phone" maxlength="60" /></label><label>Correo<input type="email" @bind="SupplierForm.Email" maxlength="160" /></label></div><label>Notas<input @bind="SupplierForm.Notes" maxlength="300" /></label><button class="button primary">Guardar proveedor</button></form><div class="subsection"><h4>Proveedores registrados</h4><div class="compact-list">@foreach (var supplier in Suppliers) { <div class="compact-row"><div><strong>@supplier.Name</strong><small>@supplier.ContactName @supplier.Phone</small></div>@if (supplier.Active) { <button class="table-action danger" @onclick="() => ArchiveSupplierAsync(supplier)">Desactivar</button> }</div> }</div></div></article>
+                    <article class="panel"><div class="panel-heading"><div><p class="eyebrow">REPOSICIÓN</p><h3>Registrar compra recibida</h3></div></div><form class="stack" @onsubmit="SavePurchaseAsync" @onsubmit:preventDefault="true"><label>Proveedor<select @bind="PurchaseForm.SupplierId" required><option value="0">Selecciona</option>@foreach (var supplier in Suppliers.Where(x => x.Active)) { <option value="@supplier.Id">@supplier.Name</option> }</select></label><label>Producto<select @bind="PurchaseForm.ProductId" required><option value="0">Selecciona</option>@foreach (var product in Products.Where(x => x.Active)) { <option value="@product.Id">@product.Name</option> }</select></label><div class="two-fields"><label>Cantidad<input type="number" min="1" @bind="PurchaseForm.Quantity" required /></label><label>Costo unitario (Bs)<input type="number" min="0" step="0.01" @bind="PurchaseForm.UnitCost" required /></label></div><button class="button primary">Guardar compra y actualizar stock</button></form></article></div>
+                    <article class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">REGISTRO</p><h3>Compras recientes</h3></div></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Proveedor</th><th>Producto</th><th class="numeric">Unidades</th><th class="numeric">Costo total</th></tr></thead><tbody>@foreach (var purchase in Purchases) { <tr><td>@ShortDate(purchase.CreatedAtUtc)</td><td>@purchase.SupplierName</td><td>@purchase.ProductName</td><td class="numeric">@purchase.Quantity</td><td class="numeric">@Money(purchase.TotalCost)</td></tr> }</tbody></table></div></article>
+                </section>
+            }
+            else if (View == "reportes")
+            {
+                <section><div class="welcome-row"><div><h2>Reportes de caja</h2><p class="muted">Consulta ventas y ganancia bruta por fecha.</p></div><label class="date-control">Fecha<input type="date" value="@ReportDate" @onchange="ReportDateChanged" /></label></div><div class="metric-grid report-metrics"><article class="metric-card"><span>Ventas</span><strong>@Money(Report?.TotalSales ?? 0)</strong><small>@(Report?.SaleCount ?? 0) ventas</small></article><article class="metric-card"><span>Efectivo</span><strong>@Money(Report?.CashTotal ?? 0)</strong></article><article class="metric-card"><span>QR</span><strong>@Money(Report?.QrTotal ?? 0)</strong></article><article class="metric-card"><span>Ganancia bruta</span><strong>@Money(Report?.GrossProfit ?? 0)</strong><small>Costo: @Money(Report?.CostOfGoods ?? 0)</small></article></div><div class="content-grid reports-grid"><article class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">VENTAS</p><h3>Detalle</h3></div></div><div class="table-wrap"><table><thead><tr><th>Venta</th><th>Fecha</th><th>Pago</th><th>Total</th></tr></thead><tbody>@foreach (var sale in Report?.Sales ?? []) { <tr><td>#@sale.Id</td><td>@ShortDate(sale.CreatedAtUtc)</td><td>@sale.PaymentMethod</td><td>@Money(sale.Total)</td></tr> }</tbody></table></div></article><article class="panel"><div class="panel-heading"><div><p class="eyebrow">PRODUCTOS</p><h3>Más vendidos</h3></div></div><div class="compact-list">@foreach (var product in Report?.TopProducts ?? []) { <div class="compact-row"><strong>@product.Product</strong><span>@product.Units uds.</span></div> }</div></article></div></section>
+            }
+            else if (View == "usuarios")
+            {
+                <section><div class="welcome-row"><div><h2>Usuarios del sistema</h2><p class="muted">Crea cuentas para el personal autorizado.</p></div></div><div class="content-grid users-grid"><article class="panel form-panel"><div class="panel-heading"><div><p class="eyebrow">ACCESO</p><h3>Crear usuario</h3></div></div><form class="stack" @onsubmit="CreateUserAsync" @onsubmit:preventDefault="true"><label>Nombre completo<input @bind="UserForm.Name" maxlength="100" required /></label><label>Usuario<input @bind="UserForm.UserName" minlength="3" maxlength="40" required /></label><label>Contraseña<input @bind="UserForm.Password" type="password" minlength="10" required /></label><label>Rol<select @bind="UserForm.Role"><option value="Cajero">Cajero</option><option value="Inventario">Inventario</option><option value="Admin">Administrador</option></select></label><button class="button primary">Crear cuenta</button></form></article><article class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">EQUIPO</p><h3>Cuentas registradas</h3></div></div><div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Usuario</th><th>Rol</th></tr></thead><tbody>@foreach (var user in Users) { <tr><td>@user.Name</td><td>@user.UserName</td><td>@RoleLabel(user.Role)</td></tr> }</tbody></table></div></article></div></section>
+            }
+            <footer class="page-foot">Stocks X X X · Sistema web de ventas e inventario</footer>
+        </main>
+    </div>
+}
+

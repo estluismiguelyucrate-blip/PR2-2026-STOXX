@@ -4,4 +4,8 @@ data/*.db
 data/*.db-shm
 data/*.db-wal
 data/keys/
+Data/*.db
+Data/*.db-shm
+Data/*.db-wal
+Data/keys/
 appsettings.*.json

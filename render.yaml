@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: pr2-2026-stoxx
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: STOXX_DATA_DIR
+        value: /var/data
+      - key: STOXX_INITIAL_SETUP_KEY
+        sync: false
+    disk:
+      name: stoxx-data
+      mountPath: /var/data
+      sizeGB: 1
