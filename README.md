@@ -41,6 +41,14 @@ Abre [http://localhost:5080](http://localhost:5080). En el primer inicio, crea l
 
 El administrador puede crear cuentas de cajero y de inventario desde **Usuarios**. La aplicación no trae usuarios, contraseñas ni productos precargados.
 
+## Acceso desde celulares y otras computadoras
+
+El enlace `http://localhost:5080` solo abre la aplicación en la misma laptop donde se está ejecutando. Si se abre ese enlace desde un celular, `localhost` apunta al propio celular, no a la laptop.
+
+La interfaz se adapta a pantallas de celulares y computadoras. Sin embargo, para que otro dispositivo entre, la aplicación debe estar configurada para aceptar conexiones desde la red local y ambos dispositivos deben estar en la misma red. Para entrar desde Internet se necesita publicar la aplicación en un servicio de alojamiento. **Esta versión todavía no está publicada para acceso público.**
+
+Antes de publicar el sistema, el equipo debe definir cómo autorizará las cuentas. En el primer inicio, quien llegue a la pantalla de configuración puede crear la primera cuenta administradora; por eso, esa configuración debe completarse antes de exponer la aplicación públicamente.
+
 ## Flujo de demostración
 
 1. Crea la cuenta administradora inicial.
