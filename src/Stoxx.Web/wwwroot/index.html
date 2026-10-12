@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102d2b">
+  <title>Ventas e inventario | STOXX</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div id="auth-screen" class="auth-shell">
+    <section class="auth-card">
+      <div class="brand-mark">S</div>
+      <p class="eyebrow">PR2-2026-STOXX</p>
+      <h1 id="auth-title">Iniciar sesión</h1>
+      <p id="auth-description" class="muted">Ingresa con tu cuenta para administrar la tienda.</p>
+      <div id="auth-alert" class="alert hidden" role="alert"></div>
+      <form id="setup-form" class="stack hidden">
+        <label>Nombre completo<input name="name" required maxlength="100" autocomplete="name"></label>
+        <label>Usuario<input name="userName" required minlength="3" maxlength="40" autocomplete="username"></label>
+        <label>Contraseña<input name="password" type="password" required minlength="10" autocomplete="new-password"></label>
+        <p class="hint">Esta será la primera cuenta y tendrá rol de administrador.</p>
+        <button class="button primary" type="submit">Crear administrador</button>
+      </form>
+      <form id="login-form" class="stack hidden">
+        <label>Usuario<input name="userName" required autocomplete="username"></label>
+        <label>Contraseña<input name="password" type="password" required autocomplete="current-password"></label>
+        <button class="button primary" type="submit">Entrar</button>
+      </form>
+    </section>
+  </div>
+
+  <div id="app-shell" class="app-shell hidden">
+    <aside class="sidebar">
+      <a class="brand" href="#inicio"><span class="brand-mark small">S</span><span>STOXX<small>Ventas e inventario</small></span></a>
+      <nav id="main-nav" aria-label="Navegación principal">
+        <button class="nav-link active" data-view="inicio"><span>◫</span> Resumen</button>
+        <button class="nav-link" data-view="ventas"><span>＋</span> Registrar venta</button>
+        <button class="nav-link" data-view="productos"><span>▦</span> Productos</button>
+        <button class="nav-link" data-view="compras"><span>⇄</span> Compras y proveedores</button>
+        <button class="nav-link" data-view="reportes"><span>▤</span> Reportes</button>
+        <button class="nav-link admin-only hidden" data-view="usuarios"><span>♙</span> Usuarios</button>
+      </nav>
+      <div class="sidebar-foot"><span class="status-dot"></span> Datos guardados localmente</div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div><p class="eyebrow">SISTEMA DE VENTAS E INVENTARIO</p><h1 id="page-title">Resumen</h1></div>
+        <div class="user-menu"><div class="avatar" id="user-avatar">S</div><div><strong id="user-name"></strong><small id="user-role"></small></div><button id="logout-button" class="button quiet">Salir</button></div>
+      </header>
+      <div id="app-alert" class="alert hidden" role="status"></div>
+
+      <section class="view" id="view-inicio">
+        <div class="welcome-row"><div><h2>Resumen del día</h2><p class="muted" id="today-label"></p></div><button class="button secondary" data-refresh>Actualizar</button></div>
+        <div class="metric-grid">
+          <article class="metric-card"><span>Ventas de hoy</span><strong id="metric-sales">Bs 0,00</strong><small id="metric-sales-count">0 ventas</small></article>
+          <article class="metric-card"><span>Ganancia bruta estimada</span><strong id="metric-profit">Bs 0,00</strong><small>Precio de venta menos costo registrado</small></article>
+          <article class="metric-card"><span>Productos activos</span><strong id="metric-products">0</strong><small>En el catálogo</small></article>
+          <article class="metric-card warning-metric"><span>Stock bajo</span><strong id="metric-low">0</strong><small>En o por debajo del mínimo</small></article>
+        </div>
+        <div class="content-grid dashboard-grid">
+          <article class="panel cash-panel">
+            <div class="panel-heading"><div><p class="eyebrow">CAJA</p><h3 id="cash-title">Caja cerrada</h3></div><span class="pill" id="cash-status">Cerrada</span></div>
+            <div id="cash-details" class="cash-details"></div>
+            <form id="cash-open-form" class="inline-form admin-cash"><label>Monto inicial (Bs)<input name="openingAmount" type="number" min="0" step="0.01" value="0" required></label><button class="button primary" type="submit">Abrir caja</button></form>
+            <form id="cash-close-form" class="inline-form hidden admin-cash"><label>Dinero contado (Bs)<input name="countedAmount" type="number" min="0" step="0.01" required></label><button class="button secondary" type="submit">Cerrar caja</button></form>
+          </article>
+          <article class="panel">
+            <div class="panel-heading"><div><p class="eyebrow">INVENTARIO</p><h3>Revisar stock</h3></div><button class="text-button" data-view="productos">Ver productos</button></div>
+            <div id="low-stock-list" class="compact-list"></div>
+          </article>
+        </div>
+        <article class="panel table-panel">
+          <div class="panel-heading"><div><p class="eyebrow">ACTIVIDAD</p><h3>Ventas recientes</h3></div><button class="text-button" data-view="reportes">Ver reportes</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Venta</th><th>Hora</th><th>Atendió</th><th>Pago</th><th class="numeric">Total</th></tr></thead><tbody id="recent-sales"></tbody></table></div>
+        </article>
+      </section>
+
+      <section class="view hidden" id="view-ventas">
+        <div class="welcome-row"><div><h2>Nueva venta</h2><p class="muted">El stock se descuenta al confirmar la venta.</p></div><span class="pill" id="sale-cash-pill">Caja cerrada</span></div>
+        <div class="content-grid sales-grid">
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">CATÁLOGO</p><h3>Agregar productos</h3></div></div>
+            <label>Buscar producto<input id="sale-search" type="search" placeholder="Nombre o código"></label>
+            <div id="sale-product-list" class="product-pick-list"></div>
+          </article>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">COBRO</p><h3>Detalle de venta</h3></div></div>
+            <div id="cart-list" class="cart-list"></div>
+            <div class="cart-total"><span>Total</span><strong id="cart-total">Bs 0,00</strong></div>
+            <form id="sale-form" class="stack"><label>Forma de pago<select name="paymentMethod"><option>Efectivo</option><option>QR</option></select></label><button class="button primary full" type="submit">Confirmar venta</button></form>
+          </article>
+        </div>
+      </section>
+
+      <section class="view hidden" id="view-productos">
+        <div class="welcome-row"><div><h2>Productos e inventario</h2><p class="muted">Administra precios, cantidades y alertas de stock.</p></div></div>
+        <div class="content-grid inventory-grid">
+          <article class="panel form-panel"><div class="panel-heading"><div><p class="eyebrow">CATÁLOGO</p><h3 id="product-form-title">Nuevo producto</h3></div></div>
+            <form id="product-form" class="stack">
+              <input type="hidden" name="id">
+              <label>Código<input name="code" required maxlength="50"></label>
+              <label>Nombre<input name="name" required maxlength="160"></label>
+              <label>Categoría<input name="category" maxlength="100"></label>
+              <div class="two-fields"><label>Costo (Bs)<input name="costPrice" type="number" min="0" step="0.01" required></label><label>Precio venta (Bs)<input name="unitPrice" type="number" min="0.01" step="0.01" required></label></div>
+              <div class="two-fields"><label>Stock<input name="stock" type="number" min="0" step="1" required></label><label>Stock mínimo<input name="minimumStock" type="number" min="0" step="1" required></label></div>
+              <div class="button-row"><button class="button primary" type="submit">Guardar producto</button><button class="button quiet hidden" id="cancel-product-edit" type="button">Cancelar</button></div>
+            </form>
+          </article>
+          <article class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">INVENTARIO</p><h3>Productos registrados</h3></div><label class="search-label"><span class="sr-only">Buscar en productos</span><input id="product-search" type="search" placeholder="Buscar"></label></div>
+            <div class="table-wrap"><table><thead><tr><th>Producto</th><th>Código</th><th class="numeric">Precio</th><th class="numeric">Stock</th><th>Estado</th><th></th></tr></thead><tbody id="products-table"></tbody></table></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="view hidden" id="view-compras">
+        <div class="welcome-row"><div><h2>Compras y proveedores</h2><p class="muted">Registra recepciones para aumentar el inventario.</p></div></div>
+        <div class="content-grid purchase-grid">
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">PROVEEDORES</p><h3>Agregar proveedor</h3></div></div>
+            <form id="supplier-form" class="stack"><label>Nombre del proveedor<input name="name" required maxlength="160"></label><label>Persona de contacto<input name="contactName" maxlength="120"></label><div class="two-fields"><label>Teléfono<input name="phone" maxlength="60"></label><label>Correo<input name="email" type="email" maxlength="160"></label></div><label>Notas<input name="notes" maxlength="300"></label><button class="button primary" type="submit">Guardar proveedor</button></form>
+            <div class="subsection"><h4>Proveedores registrados</h4><div id="supplier-list" class="compact-list"></div></div>
+          </article>
+          <article class="panel"><div class="panel-heading"><div><p class="eyebrow">REPOSICIÓN</p><h3>Registrar compra recibida</h3></div></div>
+            <form id="purchase-form" class="stack"><label>Proveedor<select name="supplierId" required></select></label><label>Producto<select name="productId" required></select></label><div class="two-fields"><label>Cantidad recibida<input name="quantity" type="number" min="1" step="1" required></label><label>Costo por unidad (Bs)<input name="unitCost" type="number" min="0" step="0.01" required></label></div><button class="button primary" type="submit">Guardar compra y actualizar stock</button></form>
+          </article>
+        </div>
+        <article class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">REGISTRO</p><h3>Compras recientes</h3></div></div><div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Proveedor</th><th>Producto</th><th class="numeric">Unidades</th><th class="numeric">Costo total</th></tr></thead><tbody id="purchases-table"></tbody></table></div></article>
+      </section>
+
+      <section class="view hidden" id="view-reportes">
+        <div class="welcome-row"><div><h2>Reportes de caja</h2><p class="muted">Consulta ventas y ganancia bruta por fecha.</p></div><label class="date-control">Fecha<input id="report-date" type="date"></label></div>
+        <div class="metric-grid report-metrics"><article class="metric-card"><span>Ventas</span><strong id="report-total">Bs 0,00</strong><small id="report-count">0 ventas</small></article><article class="metric-card"><span>Efectivo</span><strong id="report-cash">Bs 0,00</strong></article><article class="metric-card"><span>QR</span><strong id="report-qr">Bs 0,00</strong></article><article class="metric-card"><span>Ganancia bruta</span><strong id="report-profit">Bs 0,00</strong><small id="report-cost">Costo de productos: Bs 0,00</small></article></div>
+        <div class="content-grid reports-grid"><article class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">VENTAS</p><h3>Detalle</h3></div></div><div class="table-wrap"><table><thead><tr><th>Venta</th><th>Hora</th><th>Pago</th><th>Productos</th><th class="numeric">Total</th></tr></thead><tbody id="report-sales"></tbody></table></div></article><article class="panel"><div class="panel-heading"><div><p class="eyebrow">PRODUCTOS</p><h3>Más vendidos</h3></div></div><div id="top-products" class="compact-list"></div></article></div>
+      </section>
+
+      <section class="view hidden" id="view-usuarios">
+        <div class="welcome-row"><div><h2>Usuarios del sistema</h2><p class="muted">Crea cuentas para el personal autorizado.</p></div></div>
+        <div class="content-grid users-grid"><article class="panel form-panel"><div class="panel-heading"><div><p class="eyebrow">ACCESO</p><h3>Crear usuario</h3></div></div>
+          <form id="user-form" class="stack"><label>Nombre completo<input name="name" required maxlength="100"></label><label>Usuario<input name="userName" required minlength="3" maxlength="40"></label><label>Contraseña<input name="password" type="password" required minlength="10"></label><label>Rol<select name="role"><option value="Cajero">Cajero</option><option value="Inventario">Inventario</option><option value="Admin">Administrador</option></select></label><button class="button primary" type="submit">Crear cuenta</button></form>
+        </article><article class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">EQUIPO</p><h3>Cuentas registradas</h3></div></div><div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Usuario</th><th>Rol</th></tr></thead><tbody id="users-table"></tbody></table></div></article></div>
+      </section>
+      <footer class="page-foot">PR2-2026-STOXX · Sistema web de ventas e inventario</footer>
+    </main>
+  </div>
+  <div id="toast" class="toast hidden" role="status"></div>
+</body>
+</html>

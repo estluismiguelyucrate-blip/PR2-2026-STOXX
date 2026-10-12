@@ -1,48 +1,72 @@
 # PR2-2026-STOXX
 
-## Información del proyecto
+Aplicación web académica para registrar ventas, controlar inventario y consultar cierres de caja de un pequeño comercio.
 
-- **Nombre del repositorio:** PR2-2026-STOXX.
-- **Nombre usado en los materiales:** Sistema Web de Ventas e Inventario (hoja de Gantt); la presentación lo denomina “Ventas e inventario”.
-- **Problema:** En pequeñas tiendas y otros comercios, las ventas y el inventario suelen registrarse por separado o manualmente. Al no descontarse automáticamente el stock al vender, pueden pasar inadvertidos los productos agotados, acumularse mercancías de baja rotación y tomar tiempo los cierres de caja.
-- **Propósito:** Automatizar procesos básicos de ventas, inventario y caja para apoyar la gestión de pequeños comercios.
-- **Objetivos documentados:** Registrar ventas con pago en efectivo o QR y actualizar el stock; alertar sobre existencias bajas; apoyar la reposición y gestión de proveedores; generar reportes diarios; y ofrecer una interfaz sencilla.
-- **Usuarios identificados:** Propietarios o administradores, vendedores o cajeros y personal encargado del inventario. El documento también identifica a los clientes como personas afectadas por el problema.
-- **Descripción general:** Los materiales describen un sistema para ventas, caja, inventario, compras y proveedores, alertas de stock y reportes. La presentación plantea una aplicación web y menciona acceso desde navegador.
+## Problema y propósito
 
-## Integrantes
+El documento del proyecto describe comercios que anotan ventas y existencias por separado. Al vender, el inventario puede no actualizarse, lo que dificulta detectar faltantes, planificar reposiciones y cuadrar la caja.
 
-Los archivos de integrantes están en [`equipo/`](equipo/).
+El sistema reúne ventas, inventario, proveedores, compras y reportes para automatizar esos registros. Está pensado para propietarios o administradores, vendedores o cajeros y responsables de inventario.
 
-| Integrante | Responsabilidad indicada |
-|---|---|
-| Luis Miguel Yucra Terrazas | Desarrollador principal; el documento del proyecto también le asigna Scrum Master. |
-| Heydam Matías Céspedes Hurtado | Análisis de sistemas y base de datos. |
-| Magdiel Simón Grandidier Alegría | Pruebas (QA) y documentación. |
+## Qué incluye esta versión
 
-**Dato por confirmar:** `equipo/QA.txt` escribe el nombre como “Magdiel Siomn Grandidier Alegria”, mientras el documento del proyecto y la presentación usan “Magdiel Simón Grandidier Alegría”.
+- Inicio de sesión y cuentas con roles de administrador, cajero e inventario.
+- Configuración inicial para crear la primera cuenta administradora.
+- Catálogo de productos, precios, existencias y umbrales de stock mínimo.
+- Registro de ventas en efectivo o QR con descuento de existencias y control de stock insuficiente.
+- Apertura y cierre de caja, con cálculo del efectivo esperado y diferencia frente al conteo.
+- Registro de proveedores y compras recibidas que actualizan el inventario.
+- Resumen diario, alertas de stock bajo, totales por forma de pago, costo de mercancía, ganancia bruta y productos vendidos.
+- Base de datos SQLite local. El catálogo empieza vacío para que el equipo introduzca sus datos reales.
 
-## Estado actual
+## Tecnologías elegidas para esta implementación
 
-El repositorio contiene el documento del proyecto, la presentación y materiales de planificación. Los archivos entregados no incluyen implementación ni pruebas del sistema. El Gantt contempla tareas de desarrollo posteriores a las tareas iniciales de documentación y organización.
+La presentación propone una aplicación web con C# y ASP.NET Core. Esta versión sigue esa propuesta y utiliza SQLite. El PDF contiene alternativas incompatibles en distintas secciones (Java, C++, escritorio y C#/ASP.NET Core web); el equipo debe confirmar cuál descripción conservar en la documentación académica.
 
-**Decisión pendiente del equipo:** los documentos discrepan sobre la tecnología y el tipo de aplicación. El PDF menciona Java para un módulo, C++ y una aplicación de escritorio en una sección, y C#/ASP.NET Core y una aplicación web en otra; la presentación describe una aplicación web con C#. Este README no elige una alternativa. El equipo debe confirmar cuál es la definición vigente antes de iniciar la implementación.
+## Requisitos
 
-## Documentos
+- .NET SDK 10.
+- Windows, macOS o Linux con soporte para ASP.NET Core.
+- Conexión a Internet la primera vez para restaurar el paquete de SQLite.
 
-- [Documento del proyecto (PDF)](docs/proyecto/Proyecto_Programa_Unido_con_Gantt.pdf)
-- [Presentación](docs/presentacion/Presentacion.pptx)
-- [Gantt editable (Excel)](docs/gantt/Diagrama_Gantt_tabla.xlsx)
-- [Diagrama de Gantt (imagen)](docs/gantt/Diagrama_Gantt.png)
+## Ejecutar localmente
 
-## Estructura
+Desde la raíz del repositorio:
 
+```powershell
+dotnet run --project src/Stoxx.Web/Stoxx.Web.csproj
+```
+
+Abre [http://localhost:5080](http://localhost:5080). En el primer inicio, crea la cuenta administradora. Luego agrega los productos y proveedores que usará la demostración. La base de datos se guarda en `src/Stoxx.Web/data/stoxx.db` y está excluida de Git.
+
+El administrador puede crear cuentas de cajero y de inventario desde **Usuarios**. La aplicación no trae usuarios, contraseñas ni productos precargados.
+
+## Flujo de demostración
+
+1. Crea la cuenta administradora inicial.
+2. Registra algunos productos con costo, precio, cantidad inicial y stock mínimo.
+3. Registra al menos un proveedor y, si corresponde, una compra recibida.
+4. Abre la caja con un monto inicial.
+5. Registra una venta en efectivo o QR y comprueba que cambie el stock.
+6. Consulta el resumen, las alertas y el reporte diario; cierra la caja ingresando el efectivo contado.
+
+Usa datos de demostración claramente identificados y autorizados por tu equipo antes de exponer la aplicación en clase. No cargues información personal o financiera real.
+
+## Estructura del repositorio
+
+- `src/Stoxx.Web/`: aplicación ASP.NET Core, interfaz y persistencia SQLite.
 - `docs/proyecto/`: documento del proyecto.
-- `docs/presentacion/`: presentación.
-- `docs/gantt/`: planificación editable y su imagen.
-- `docs/reuniones/`: documentos de reuniones.
-- `equipo/`: integrantes y responsabilidades.
-- `src/`: código fuente cuando comience el desarrollo.
-- `tests/`: pruebas.
-- `resources/`: imágenes, base de datos y otros recursos.
-- `QA/`: casos de prueba y evidencias.
+- `docs/presentacion/`: presentación del equipo.
+- `docs/gantt/`: planificación editable y diagrama.
+- `equipo/`: archivos de integrantes y responsabilidades.
+- `tests/`: reservado para pruebas del proyecto.
+- `resources/`: reservado para recursos compartidos.
+- `QA/`: reservado para casos de prueba y evidencias.
+
+## Documentos del equipo
+
+- [Documento del proyecto](docs/proyecto/Proyecto_Programa_Unido_con_Gantt.pdf)
+- [Presentación](docs/presentacion/Presentacion.pptx)
+- [Gantt editable](docs/gantt/Diagrama_Gantt_tabla.xlsx)
+- [Diagrama de Gantt](docs/gantt/Diagrama_Gantt.png)
+- [Integrantes](equipo/)
