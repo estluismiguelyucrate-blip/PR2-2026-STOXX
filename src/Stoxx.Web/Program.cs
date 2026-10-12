@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,8 +9,15 @@ using Stoxx.Web.Contracts;
 using Stoxx.Web.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 var dataDirectory = Path.Combine(builder.Environment.ContentRootPath, "data");
 Directory.CreateDirectory(dataDirectory);
+var keyDirectory = Path.Combine(dataDirectory, "keys");
+Directory.CreateDirectory(keyDirectory);
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(keyDirectory))
+    .SetApplicationName("Stoxx.Web");
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? $"Data Source={Path.Combine(dataDirectory, "stoxx.db")}";
 

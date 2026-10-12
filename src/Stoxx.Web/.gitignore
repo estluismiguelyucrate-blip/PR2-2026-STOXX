@@ -3,4 +3,5 @@ obj/
 data/*.db
 data/*.db-shm
 data/*.db-wal
+data/keys/
 appsettings.*.json
