@@ -108,6 +108,71 @@ public sealed class AuthAndAuthorizationTests
         Assert.Equal(HttpStatusCode.Forbidden, usersResponse.StatusCode);
     }
 
+
+    [Fact]
+    public async Task Sale_reduces_stock_and_rejects_quantity_above_available_stock()
+    {
+        using var factory = new StoxxWebApplicationFactory();
+        using var client = factory.CreateClient();
+
+        var setup = await client.PostAsJsonAsync("/api/auth/setup", new
+        {
+            name = "Admin de prueba",
+            userName = "admin_sale",
+            password = "PruebaSegura123!"
+        });
+        Assert.Equal(HttpStatusCode.OK, setup.StatusCode);
+
+        var login = await client.PostAsJsonAsync("/api/auth/login", new
+        {
+            userName = "admin_sale",
+            password = "PruebaSegura123!"
+        });
+        Assert.Equal(HttpStatusCode.OK, login.StatusCode);
+
+        var productResponse = await client.PostAsJsonAsync("/api/products", new
+        {
+            code = "TEST-001",
+            name = "Producto de prueba",
+            category = "Pruebas",
+            costPrice = 2.50m,
+            unitPrice = 5.00m,
+            stock = 10,
+            minimumStock = 2
+        });
+        Assert.Equal(HttpStatusCode.Created, productResponse.StatusCode);
+        var product = await productResponse.Content.ReadFromJsonAsync<ProductCreated>();
+        Assert.NotNull(product);
+
+        var openCash = await client.PostAsJsonAsync("/api/cash/open", new { openingAmount = 100m });
+        Assert.Equal(HttpStatusCode.Created, openCash.StatusCode);
+
+        var sale = await client.PostAsJsonAsync("/api/sales", new
+        {
+            paymentMethod = "Efectivo",
+            items = new[] { new { productId = product.Id, quantity = 2 } }
+        });
+        Assert.Equal(HttpStatusCode.Created, sale.StatusCode);
+
+        var products = await client.GetFromJsonAsync<List<ProductStock>>("/api/products");
+        Assert.NotNull(products);
+        Assert.Equal(8, products.Single(x => x.Id == product.Id).Stock);
+
+        var oversell = await client.PostAsJsonAsync("/api/sales", new
+        {
+            paymentMethod = "Efectivo",
+            items = new[] { new { productId = product.Id, quantity = 9 } }
+        });
+        Assert.Equal(HttpStatusCode.Conflict, oversell.StatusCode);
+
+        products = await client.GetFromJsonAsync<List<ProductStock>>("/api/products");
+        Assert.NotNull(products);
+        Assert.Equal(8, products.Single(x => x.Id == product.Id).Stock);
+    }
+
+    private sealed record ProductCreated(int Id, string Name);
+    private sealed record ProductStock(int Id, string Name, int Stock);
+
     private sealed class StoxxWebApplicationFactory : WebApplicationFactory<Program>
     {
         private readonly string _dataDirectory = Path.Combine(
