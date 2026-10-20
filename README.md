@@ -15,6 +15,7 @@ Se incorporó una carpeta de documentación para organizar los criterios de apro
 - [Cronograma de cierre de brechas](docs/planificacion/CRONOGRAMA_MADUREZ.md)
 - [Responsabilidades y matriz de riesgos](docs/gestion/RIESGOS_Y_RESPONSABILIDADES.md)
 - [Matriz de pruebas del MVP](QA/casos-prueba/MATRIZ_PRUEBAS_MVP.md)
+- [Flujo de compilación y pruebas automáticas](.github/workflows/dotnet-ci.yml)
 - [Cómo guardar las evidencias](QA/evidencias/README.md)
 
 ## Problema y propósito
@@ -84,7 +85,9 @@ El repositorio incluye `Dockerfile` y `render.yaml` para el despliegue en Render
 - `docs/gestion/`: responsables y riesgos.
 - `docs/presentacion/`: presentación del equipo.
 - `docs/gantt/`: cronograma original.
-- `QA/casos-prueba/`: casos de prueba.
+- `.github/workflows/dotnet-ci.yml`: compilación y pruebas automáticas en GitHub Actions.
+- `tests/Stoxx.Web.Tests/`: pruebas de integración de salud, configuración inicial, autenticación y permisos.
+- `QA/casos-prueba/`: matriz de pruebas manuales y seguimiento de resultados.
 - `QA/evidencias/`: capturas y resultados de ejecución.
 - `equipo/`: integrantes y responsabilidades.
 
