@@ -2,6 +2,10 @@
 
 Aplicación web académica para registrar ventas, controlar inventario y consultar cierres de caja de un pequeño comercio.
 
+## Aplicación publicada
+
+**Abrir la aplicación web:** [https://stocks-con-3x.onrender.com/](https://stocks-con-3x.onrender.com/)
+
 ## Problema y propósito
 
 El documento del proyecto describe comercios que anotan ventas y existencias por separado. Al vender, el inventario puede no actualizarse, lo que dificulta detectar faltantes, planificar reposiciones y cuadrar la caja.
