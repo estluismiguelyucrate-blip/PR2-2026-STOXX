@@ -26,6 +26,12 @@ Ejecutar cada caso con datos ficticios. Antes de la ejecución, registrar la fec
 | TC-12 | Crear un registro de prueba, reiniciar el servicio y volver a consultarlo. | El registro continúa disponible en el entorno con persistencia configurada. | Pendiente | `TC-12-persistencia.png` |
 | TC-13 | Consultar una alerta con stock por debajo del mínimo configurado. | El producto se identifica como stock bajo según la regla configurada. | Pendiente | `TC-13-alerta-stock.png` |
 
+## Pruebas automatizadas
+
+Se incorporó un proyecto de pruebas de integración en `tests/Stoxx.Web.Tests/` y un flujo de GitHub Actions en `.github/workflows/dotnet-ci.yml`. Las pruebas automatizadas cubren el endpoint de salud, la creación inicial de administrador de un solo uso, inicio de sesión, rechazo de usuarios no autenticados y restricción de gestión de usuarios para el rol cajero.
+
+**Estado de ejecución:** pendiente de confirmar en GitHub Actions. No se debe presentar como aprobado hasta que el flujo finalice correctamente. Las pruebas manuales de venta, stock, compras, caja, reportes y persistencia siguen requiriendo ejecución y evidencias reales.
+
 ## Registro de ejecución
 
 Copiar este bloque por cada prueba ejecutada:
