@@ -22,5 +22,6 @@ Usar los nombres TC-01 a TC-13 definidos en la matriz, por ejemplo:
 
 - `E-01-resumen.png` a `E-04-configuracion-inicial.png`: copias anonimizadas de capturas proporcionadas por el equipo; muestran pantallas de escritorio, no validan por sí solas una operación.
 - [E-05 — ejecución local](qa-runtime-2026-10-20.md): registro de recorrido HTTP con base SQLite temporal y datos ficticios. No corresponde a Render.
+- [E-06 — acceso público a Render](E-06-render-acceso-2026-10-20.md): comprobación de solo lectura; la URL cargó y solicitó configurar el primer administrador. No se creó una cuenta en producción.
 
 La matriz TC-01–TC-13 conserva el seguimiento formal de esas pruebas; los resultados de E-05 son una comprobación local adicional y no deben marcar automáticamente como aprobados los casos ejecutados con otro entorno/datos.

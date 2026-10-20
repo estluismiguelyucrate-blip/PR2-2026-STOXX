@@ -12,7 +12,7 @@ Ejecutar cada caso con datos ficticios. Antes de la ejecución, registrar la fec
 
 | ID | Prueba y pasos | Resultado esperado | Estado | Evidencia |
 |---|---|---|---|---|
-| TC-01 | Abrir la URL pública y navegar hasta la pantalla inicial. | La página carga sin error; si falla, registrar el mensaje y la hora. | Pendiente | `TC-01-URL.png` |
+| TC-01 | Abrir la URL pública y navegar hasta la pantalla inicial. | La página carga sin error; si falla, registrar el mensaje y la hora. | Aprobado: cargó el formulario inicial tras el arranque en frío. | [E-06 — Render](../evidencias/E-06-render-acceso-2026-10-20.md) |
 | TC-02 | En un entorno de prueba limpio, seguir el flujo de creación del primer administrador. | La cuenta se crea una sola vez y permite iniciar sesión. | Pendiente | `TC-02-admin.png` |
 | TC-03 | Iniciar sesión con una cuenta válida. | Se accede a las secciones autorizadas para el rol. | Pendiente | `TC-03-login.png` |
 | TC-04 | Intentar iniciar sesión con una contraseña incorrecta. | El acceso se rechaza sin revelar información sensible. | Pendiente | `TC-04-login-rechazado.png` |
@@ -36,7 +36,7 @@ Esta ejecución no se hizo contra Render y no cubre todos los pasos/datos espec�
 
 Se incorporó un proyecto de pruebas de integración en `tests/Stoxx.Web.Tests/` y un flujo de GitHub Actions en `.github/workflows/dotnet-ci.yml`. Las pruebas automatizadas cubren el endpoint de salud, la creación inicial de administrador de un solo uso, inicio de sesión, rechazo de usuarios no autenticados y restricción de gestión de usuarios para el rol cajero.
 
-**Estado de ejecución:** pendiente de confirmar en GitHub Actions. No se debe presentar como aprobado hasta que el flujo finalice correctamente. Las pruebas manuales de venta, stock, compras, caja, reportes y persistencia siguen requiriendo ejecución y evidencias reales.
+**Estado de ejecución:** el flujo del commit `f84e1d5` falló: 3 pruebas pasaron y 2 fallaron porque la configuración inicial de administrador respondió 409 en vez de 200. Se aisló la ruta de datos por fábrica de prueba en el código local; falta confirmar la corrección mediante una nueva ejecución de GitHub Actions. Las pruebas manuales de venta, stock, compras, caja, reportes y persistencia siguen requiriendo ejecución y evidencias reales.
 
 ## Registro de ejecución
 
@@ -62,9 +62,9 @@ Marcar una prueba como **aprobada** únicamente después de ejecutarla y comprob
 | Indicador | Valor actual |
 |---|---:|
 | Casos definidos | 13 |
-| Aprobados | 0 registrados |
+| Aprobados | 1 registrado (TC-01, Render) |
 | Fallidos | 0 registrados |
 | Bloqueados | 0 registrados |
-| Pendientes de ejecutar | 13 |
+| Pendientes de ejecutar | 12 |
 
 Los valores reflejan el registro documental inicial; no son un informe de ejecución automatizada.

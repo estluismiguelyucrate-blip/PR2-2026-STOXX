@@ -2,7 +2,6 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
 using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
@@ -181,12 +180,9 @@ public sealed class AuthAndAuthorizationTests
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("Development");
-            builder.ConfigureAppConfiguration((_, configuration) =>
-                configuration.AddInMemoryCollection(new Dictionary<string, string?>
-                {
-                    ["STOXX_DATA_DIR"] = _dataDirectory,
-                    ["ConnectionStrings:DefaultConnection"] = $"Data Source={Path.Combine(_dataDirectory, "test.db")}"
-                }));
+            // Use the WebHost setting provider so each factory gets its own SQLite file.
+            // This prevents users created by one test leaking into the next test's database.
+            builder.UseSetting("STOXX_DATA_DIR", _dataDirectory);
         }
 
         protected override void Dispose(bool disposing)

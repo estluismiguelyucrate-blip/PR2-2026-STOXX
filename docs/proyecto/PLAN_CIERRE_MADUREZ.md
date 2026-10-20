@@ -54,7 +54,7 @@ Documento: [Responsabilidades y riesgos](../gestion/RIESGOS_Y_RESPONSABILIDADES.
 
 ## 6. Validación técnica y seguridad
 
-- [ ] La URL de Render carga y se guarda evidencia fechada.
+- [x] La URL de Render carga y se guarda evidencia fechada: [E-06](../../QA/evidencias/E-06-render-acceso-2026-10-20.md). La pantalla de alta inicial sigue pendiente de completar por el administrador designado.
 - [ ] La creación inicial del administrador se prueba en entorno controlado.
 - [ ] Se verifica que el inicio de sesión rechace credenciales incorrectas.
 - [ ] Se comprueban los permisos de administrador, cajero e inventario.

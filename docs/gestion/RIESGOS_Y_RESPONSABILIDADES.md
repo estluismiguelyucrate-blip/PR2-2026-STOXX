@@ -24,7 +24,7 @@ Las responsabilidades se basan en los archivos de roles que ya están en la carp
 | R-05 | La documentación apunta a archivos ausentes o con nombres distintos. | Media | Medio | Abrir cada enlace desde una sesión externa y mantener rutas relativas exactas en README. | Magdiel |
 | R-06 | Se presentan resultados sin evidencia verificable. | Media | Alto | No aprobar casos sin captura o registro; mantener la matriz actualizada y nombrar archivos por ID de prueba. | Magdiel |
 | R-07 | Un integrante no puede completar su tarea a tiempo. | Media | Medio | Dividir tareas pequeñas, registrar bloqueos en reuniones y asignar apoyo o reemplazo explícito. | Equipo completo |
-| R-08 | La configuración inicial de administrador queda expuesta o se permite crear administradores de forma indebida. | Media | Alto | Probar el primer inicio en entorno controlado; verificar que el alta inicial quede cerrada después de crear la cuenta y revisar restricciones de roles. | Luis Miguel |
+| R-08 | La configuración inicial de administrador queda expuesta o se permite crear administradores de forma indebida. | Alta observada mientras `setupRequired` sea verdadero | Alto | El 20-10-2026 Render respondió `setupRequired: true`; el alta inicial aún no estaba completada. El administrador designado debe crear la primera cuenta y el equipo debe comprobar que el endpoint quede cerrado inmediatamente después. Mantener la URL sin presentar como sistema configurado hasta esa verificación. Evidencia: [E-06](../../QA/evidencias/E-06-render-acceso-2026-10-20.md). | Luis Miguel |
 
 Las probabilidades son estimaciones iniciales del equipo, no mediciones estadísticas. Deben actualizarse al revisar la situación real.
 

@@ -58,6 +58,8 @@ Abre [http://localhost:5080](http://localhost:5080). En el primer inicio, sigue 
 
 El repositorio incluye `Dockerfile` y `render.yaml` para el despliegue en Render con almacenamiento persistente. La URL publicada es [https://stocks-con-3x.onrender.com/](https://stocks-con-3x.onrender.com/). El equipo debe verificar que cargue y que las operaciones de prueba se conserven después de reiniciar el servicio.
 
+En la comprobación de solo lectura del 20-10-2026, el sitio cargó y pidió configurar el primer administrador (`setupRequired: true`). No se creó una cuenta en el servicio. El administrador designado debe completar esta configuración y el equipo debe comprobar el cierre de la ruta inicial antes de presentar el sistema como configurado. Ver [E-06](QA/evidencias/E-06-render-acceso-2026-10-20.md).
+
 ## Flujo de demostración de extremo a extremo
 
 1. Inicia la aplicación y configura la cuenta administradora inicial.
