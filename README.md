@@ -10,6 +10,7 @@ Aplicación web académica para registrar ventas, controlar inventario y consult
 
 Se incorporó una carpeta de documentación para organizar los criterios de aprobación. Los documentos describen qué debe comprobarse y dónde guardar las evidencias. **La existencia de estos documentos no significa que las pruebas técnicas ya estén aprobadas**: el equipo debe ejecutar cada caso y registrar el resultado real.
 
+- [Lista de cierre para el cuestionario de madurez](docs/proyecto/PLAN_CIERRE_MADUREZ.md)
 - [Objetivos, alcance y criterios de aceptación](docs/proyecto/ALCANCE_OBJETIVOS_CRITERIOS.md)
 - [Cronograma de cierre de brechas](docs/planificacion/CRONOGRAMA_MADUREZ.md)
 - [Responsabilidades y matriz de riesgos](docs/gestion/RIESGOS_Y_RESPONSABILIDADES.md)
