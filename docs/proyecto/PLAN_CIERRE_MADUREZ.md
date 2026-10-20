@@ -2,6 +2,10 @@
 
 Usar esta lista en la reunión del equipo. Marcar una tarea como completa solo cuando el enlace, la revisión o la prueba se haya comprobado.
 
+## Observación sobre la consistencia de las fuentes
+
+El PDF del proyecto contiene versiones técnicas incompatibles: las páginas iniciales describen una aplicación de escritorio en C++/Java y páginas posteriores describen una aplicación web en C#; el repositorio actual contiene una aplicación ASP.NET Core con SQLite. El equipo debe acordar la descripción vigente y alinear el PDF/presentación antes de considerar cerrada la revisión documental. La observación del Gantt original está resumida en [seguimiento](../gantt/seguimiento.md).
+
 ## 1. Documentación
 
 - [ ] Abrir desde GitHub el PDF del proyecto.

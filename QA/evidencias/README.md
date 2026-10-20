@@ -18,4 +18,9 @@ Usar los nombres TC-01 a TC-13 definidos en la matriz, por ejemplo:
 5. Para cálculos de caja e inventario, incluir los datos de prueba necesarios para comprobar el resultado sin exponer información real.
 6. Si la aplicación publicada no está disponible, guardar una captura del error con fecha y registrar la prueba como bloqueada; no sustituirla por una captura de otro entorno.
 
-Actualmente no se adjuntan evidencias de ejecución en este directorio. Deben incorporarse después de realizar las pruebas.
+## Evidencias incorporadas el 20-10-2026
+
+- `E-01-resumen.png` a `E-04-configuracion-inicial.png`: copias anonimizadas de capturas proporcionadas por el equipo; muestran pantallas de escritorio, no validan por sí solas una operación.
+- [E-05 — ejecución local](qa-runtime-2026-10-20.md): registro de recorrido HTTP con base SQLite temporal y datos ficticios. No corresponde a Render.
+
+La matriz TC-01–TC-13 conserva el seguimiento formal de esas pruebas; los resultados de E-05 son una comprobación local adicional y no deben marcar automáticamente como aprobados los casos ejecutados con otro entorno/datos.

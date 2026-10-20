@@ -95,3 +95,10 @@ El repositorio incluye `Dockerfile` y `render.yaml` para el despliegue en Render
 ## Condición para declarar el proyecto listo
 
 No marcar el proyecto como aprobado hasta que el equipo haya ejecutado las pruebas críticas, registrado resultados y adjuntado evidencias reales. Las fechas y responsables del cronograma deben revisarse y confirmarse por el equipo.
+
+
+## Resultados locales de la revisión del 20-10-2026
+
+Se compiló la aplicación y se ejecutó un recorrido HTTP local con una base SQLite temporal: inicio inicial, permisos muestreados por rol, compra, ventas en efectivo/QR, rechazo por stock, caja, reporte y recuperación de datos tras reiniciar. El detalle está en [E-05](QA/evidencias/qa-runtime-2026-10-20.md); las capturas de interfaz anonimizadas también están en [evidencias](QA/evidencias/README.md). Esto no valida el servicio público de Render ni sustituye la ejecución formal de todos los casos TC-01–TC-13.
+
+La revisión del documento fuente identificó descripciones técnicas contradictorias entre versiones de escritorio C++/Java y web C#/ASP.NET Core; ver [nota de seguimiento del Gantt y documentos](docs/gantt/seguimiento.md). El equipo debe resolverlo antes de declarar la madurez aprobada.

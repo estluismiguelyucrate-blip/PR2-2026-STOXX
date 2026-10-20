@@ -26,6 +26,12 @@ Ejecutar cada caso con datos ficticios. Antes de la ejecución, registrar la fec
 | TC-12 | Crear un registro de prueba, reiniciar el servicio y volver a consultarlo. | El registro continúa disponible en el entorno con persistencia configurada. | Pendiente | `TC-12-persistencia.png` |
 | TC-13 | Consultar una alerta con stock por debajo del mínimo configurado. | El producto se identifica como stock bajo según la regla configurada. | Pendiente | `TC-13-alerta-stock.png` |
 
+## Ejecución local adicional del 20-10-2026
+
+Se realizó un recorrido HTTP aislado con datos ficticios y una base SQLite temporal. Pasaron alta inicial de administrador (incluido el rechazo del segundo alta), 401 sin sesión, permisos muestreados de Cajero e Inventario, compra y actualización de existencias, venta en efectivo y QR, rechazo de sobreventa, cierre de caja, totales de reporte y recuperación de usuarios/productos/compras/ventas después de reiniciar el proceso local. El registro detallado está en [E-05](../evidencias/qa-runtime-2026-10-20.md).
+
+Esta ejecución no se hizo contra Render y no cubre todos los pasos/datos específicos de TC-01–TC-13. Por eso se mantiene el resumen formal de casos como pendiente de registro, y no se afirma aprobación del cuestionario.
+
 ## Pruebas automatizadas
 
 Se incorporó un proyecto de pruebas de integración en `tests/Stoxx.Web.Tests/` y un flujo de GitHub Actions en `.github/workflows/dotnet-ci.yml`. Las pruebas automatizadas cubren el endpoint de salud, la creación inicial de administrador de un solo uso, inicio de sesión, rechazo de usuarios no autenticados y restricción de gestión de usuarios para el rol cajero.
