@@ -36,7 +36,7 @@ Esta ejecución no se hizo contra Render y no cubre todos los pasos/datos espec�
 
 Se incorporó un proyecto de pruebas de integración en `tests/Stoxx.Web.Tests/` y un flujo de GitHub Actions en `.github/workflows/dotnet-ci.yml`. Las pruebas automatizadas cubren el endpoint de salud, la creación inicial de administrador de un solo uso, inicio de sesión, rechazo de usuarios no autenticados y restricción de gestión de usuarios para el rol cajero.
 
-**Estado de ejecución:** el flujo del commit `f84e1d5` falló: 3 pruebas pasaron y 2 fallaron porque la configuración inicial de administrador respondió 409 en vez de 200. Se aisló la ruta de datos por fábrica de prueba en el código local; falta confirmar la corrección mediante una nueva ejecución de GitHub Actions. Las pruebas manuales de venta, stock, compras, caja, reportes y persistencia siguen requiriendo ejecución y evidencias reales.
+**Estado de ejecución:** el flujo del commit `f84e1d5` falló (3 de 5 pruebas) porque la configuración inicial de administrador respondió 409 en vez de 200. Se corrigió el aislamiento de la base temporal por fábrica de prueba. En el commit `32bed0c`, GitHub Actions compiló sin advertencias ni errores y aprobó las 5 pruebas automáticas. Ver [E-07 — CI](../evidencias/E-07-github-actions-2026-10-20.md). Las pruebas manuales de venta, compras, caja, reportes y persistencia en Render siguen requiriendo ejecución y evidencias reales.
 
 ## Registro de ejecución
 
@@ -67,4 +67,4 @@ Marcar una prueba como **aprobada** únicamente después de ejecutarla y comprob
 | Bloqueados | 0 registrados |
 | Pendientes de ejecutar | 12 |
 
-Los valores reflejan el registro documental inicial; no son un informe de ejecución automatizada.
+Los valores cuentan únicamente los casos manuales TC-01–TC-13. El resultado automatizado de GitHub Actions se informa por separado arriba.

@@ -23,5 +23,6 @@ Usar los nombres TC-01 a TC-13 definidos en la matriz, por ejemplo:
 - `E-01-resumen.png` a `E-04-configuracion-inicial.png`: copias anonimizadas de capturas proporcionadas por el equipo; muestran pantallas de escritorio, no validan por sí solas una operación.
 - [E-05 — ejecución local](qa-runtime-2026-10-20.md): registro de recorrido HTTP con base SQLite temporal y datos ficticios. No corresponde a Render.
 - [E-06 — acceso público a Render](E-06-render-acceso-2026-10-20.md): comprobación de solo lectura; la URL cargó y solicitó configurar el primer administrador. No se creó una cuenta en producción.
+- [E-07 — GitHub Actions](E-07-github-actions-2026-10-20.md): compilación correcta y 5 de 5 pruebas automatizadas aprobadas en el commit `32bed0c`.
 
-La matriz TC-01–TC-13 conserva el seguimiento formal de esas pruebas; los resultados de E-05 son una comprobación local adicional y no deben marcar automáticamente como aprobados los casos ejecutados con otro entorno/datos.
+La matriz TC-01–TC-13 conserva el seguimiento de las pruebas manuales. E-05 acredita ejecución local; E-06 acredita únicamente la carga de la URL pública y su estado de configuración; E-07 acredita la suite automatizada en GitHub Actions. Ninguno sustituye los casos manuales de los que no existe evidencia.
