@@ -13,6 +13,7 @@ Se incorporó una carpeta de documentación para organizar los criterios de apro
 - [Lista de cierre para el cuestionario de madurez](docs/proyecto/PLAN_CIERRE_MADUREZ.md)
 - [Objetivos, alcance y criterios de aceptación](docs/proyecto/ALCANCE_OBJETIVOS_CRITERIOS.md)
 - [Cronograma de cierre de brechas](docs/planificacion/CRONOGRAMA_MADUREZ.md)
+- [Cronograma editable para Excel (CSV)](docs/planificacion/CRONOGRAMA_MADUREZ.csv)
 - [Responsabilidades y matriz de riesgos](docs/gestion/RIESGOS_Y_RESPONSABILIDADES.md)
 - [Matriz de pruebas del MVP](QA/casos-prueba/MATRIZ_PRUEBAS_MVP.md)
 - [Flujo de compilación y pruebas automáticas](.github/workflows/dotnet-ci.yml)
