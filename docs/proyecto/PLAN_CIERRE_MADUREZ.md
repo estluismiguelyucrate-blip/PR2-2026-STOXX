@@ -4,7 +4,7 @@ Usar esta lista en la reunión del equipo. Marcar una tarea como completa solo c
 
 ## Observación sobre la consistencia de las fuentes
 
-El PDF del proyecto contiene versiones técnicas incompatibles: las páginas iniciales describen una aplicación de escritorio en C++/Java y páginas posteriores describen una aplicación web en C#; el repositorio actual contiene una aplicación ASP.NET Core con SQLite. El equipo debe acordar la descripción vigente y alinear el PDF/presentación antes de considerar cerrada la revisión documental. La observación del Gantt original está resumida en [seguimiento](../gantt/seguimiento.md).
+El PDF del proyecto contiene versiones técnicas incompatibles: las páginas iniciales describen una aplicación de escritorio en C++/Java y páginas posteriores describen una aplicación web en C#; el repositorio actual contiene una aplicación ASP.NET Core con SQLite. Se conservaron ambos documentos fuente y se prepararon una [copia del PDF con una nota técnica complementaria](Proyecto_Programa_Unido_con_Gantt_actualizado.pdf) y una [presentación actualizada](../presentacion/Presentacion-actualizada-v2.pptx) con la arquitectura y estado observados. El equipo aún debe revisar y aprobar su uso. La observación del Gantt original está resumida en [seguimiento](../gantt/seguimiento.md).
 
 ## 1. Documentación
 

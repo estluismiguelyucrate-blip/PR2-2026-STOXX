@@ -74,8 +74,10 @@ En la comprobación de solo lectura del 20-10-2026, el sitio cargó y pidió con
 
 ## Documentos originales del equipo
 
-- [Documento del proyecto (PDF)](docs/proyecto/Proyecto_Programa_Unido_con_Gantt.pdf)
-- [Presentación (PPTX)](docs/presentacion/Presentacion.pptx)
+- [Documento del proyecto original (PDF, conservado)](docs/proyecto/Proyecto_Programa_Unido_con_Gantt.pdf)
+- [Documento del proyecto con nota técnica actualizada](docs/proyecto/Proyecto_Programa_Unido_con_Gantt_actualizado.pdf)
+- [Presentación original (PPTX, conservada)](docs/presentacion/Presentacion.pptx)
+- [Presentación actualizada para la arquitectura C# y el estado de Render](docs/presentacion/Presentacion-actualizada-v2.pptx)
 - [Gantt editable (XLSX)](docs/gantt/Diagrama_Gantt_tabla.xlsx)
 - [Diagrama de Gantt (PNG)](docs/gantt/Diagrama_Gantt.png)
 - [Responsabilidades existentes del equipo](equipo/)

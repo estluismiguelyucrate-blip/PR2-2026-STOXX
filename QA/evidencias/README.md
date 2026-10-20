@@ -25,4 +25,6 @@ Usar los nombres TC-01 a TC-13 definidos en la matriz, por ejemplo:
 - [E-06 — acceso público a Render](E-06-render-acceso-2026-10-20.md): comprobación de solo lectura; la URL cargó y solicitó configurar el primer administrador. No se creó una cuenta en producción.
 - [E-07 — GitHub Actions](E-07-github-actions-2026-10-20.md): compilación correcta y 5 de 5 pruebas automatizadas aprobadas en el commit `32bed0c`.
 
+Para la exposición, usar la [presentación actualizada](../../docs/presentacion/Presentacion-actualizada-v2.pptx) y consultar la [nota técnica añadida al documento PDF](../../docs/proyecto/Proyecto_Programa_Unido_con_Gantt_actualizado.pdf). Los documentos fuente originales se conservaron sin cambios.
+
 La matriz TC-01–TC-13 conserva el seguimiento de las pruebas manuales. E-05 acredita ejecución local; E-06 acredita únicamente la carga de la URL pública y su estado de configuración; E-07 acredita la suite automatizada en GitHub Actions. Ninguno sustituye los casos manuales de los que no existe evidencia.
