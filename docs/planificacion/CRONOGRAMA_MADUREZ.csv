@@ -1,0 +1,9 @@
+ID,Actividad,Responsable principal,Apoyo,Inicio propuesto,Fin propuesto,Entregable verificable,Estado inicial
+P-01,Verificar enlaces de PDF presentación y Gantt,Luis Miguel Yucra Terrazas,Magdiel Siomn Grandidier Alegria,2026-10-20,2026-10-21,Los tres archivos abren desde GitHub,Pendiente
+P-02,Revisar objetivos alcance y criterios de aceptación,Equipo completo,Luis Miguel Yucra Terrazas,2026-10-20,2026-10-22,Documento aprobado por el equipo,Pendiente
+P-03,Confirmar cronograma general y responsables,Equipo completo,Magdiel Siomn Grandidier Alegria,2026-10-21,2026-10-23,Gantt editable revisado,Pendiente
+P-04,Ejecutar pruebas funcionales de producto ventas stock compras caja y reportes,Magdiel Siomn Grandidier Alegria,Heydam Matias Cespedes Hurtado,2026-10-22,2026-10-27,Matriz de QA con resultados y capturas reales,Pendiente
+P-05,Validar roles primer administrador y persistencia,Luis Miguel Yucra Terrazas,Heydam Matias Cespedes Hurtado,2026-10-23,2026-10-28,Resultados de seguridad y persistencia documentados,Pendiente
+P-06,Corregir defectos críticos y repetir pruebas,Luis Miguel Yucra Terrazas,Magdiel Siomn Grandidier Alegria,2026-10-28,2026-10-30,Defectos cerrados o plan de mitigación,Pendiente
+P-07,Actualizar riesgos y comprobar documentación final,Heydam Matias Cespedes Hurtado,Equipo completo,2026-10-29,2026-10-31,Enlaces y riesgos revisados,Pendiente
+P-08,Realizar revisión de madurez y decisión de presentación,Equipo completo,Luis Miguel Yucra Terrazas,2026-11-02,2026-11-03,Acta de decisión y pendientes finales,Pendiente
