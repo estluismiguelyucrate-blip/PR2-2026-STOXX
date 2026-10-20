@@ -184,7 +184,8 @@ public sealed class AuthAndAuthorizationTests
             builder.ConfigureAppConfiguration((_, configuration) =>
                 configuration.AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    ["STOXX_DATA_DIR"] = _dataDirectory
+                    ["STOXX_DATA_DIR"] = _dataDirectory,
+                    ["ConnectionStrings:DefaultConnection"] = $"Data Source={Path.Combine(_dataDirectory, "test.db")}"
                 }));
         }
 
