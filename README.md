@@ -25,6 +25,18 @@ El proyecto busca ayudar a pequeños comercios a registrar ventas y existencias 
 
 El sistema reúne ventas, inventario, proveedores, compras y reportes para facilitar esos registros. Está pensado para propietarios o administradores, vendedores o cajeros y responsables de inventario.
 
+## Equipo y responsabilidades
+
+Las responsabilidades registradas por el equipo se encuentran en [`equipo/`](equipo/). El resumen de participantes y el estado de confirmación están en [integrantes y roles](docs/equipo/integrantes-y-roles.md).
+
+| Integrante | Responsabilidad registrada |
+|---|---|
+| Luis Miguel Yucra Terrazas | Desarrollo principal |
+| Heydam Matias Cespedes Hurtado | Análisis y base de datos |
+| Magdiel Siomn Grandidier Alegria | QA y documentación |
+
+Los nombres se transcriben de los archivos del equipo; revisen su ortografía y confirmen la distribución antes de la presentación.
+
 ## Qué incluye esta versión
 
 - Inicio de sesión y cuentas con roles de administrador, cajero e inventario.
@@ -40,6 +52,8 @@ El sistema reúne ventas, inventario, proveedores, compras y reportes para facil
 
 La aplicación utiliza C# con ASP.NET Core y Blazor Server para la interfaz y la lógica. SQLite guarda los datos.
 
+La arquitectura, los requisitos implementados y el modelo de datos se describen en [`docs/arquitectura.md`](docs/arquitectura.md), [`docs/requisitos.md`](docs/requisitos.md) y [`docs/modelo-de-datos.md`](docs/modelo-de-datos.md). El alcance vigente se documenta en [objetivos, alcance y criterios de aceptación](docs/proyecto/ALCANCE_OBJETIVOS_CRITERIOS.md).
+
 ## Requisitos y ejecución local
 
 - .NET SDK 10.
@@ -53,6 +67,12 @@ dotnet run --project src/Stoxx.Web/Stoxx.Web.csproj
 ```
 
 Abre [http://localhost:5080](http://localhost:5080). En el primer inicio, sigue el flujo de creación de la cuenta administradora. Después agrega productos y proveedores de prueba. No uses datos personales ni financieros reales.
+
+Para compilar y ejecutar las pruebas automatizadas:
+
+```powershell
+dotnet test tests/Stoxx.Web.Tests/Stoxx.Web.Tests.csproj --configuration Release
+```
 
 ## Publicación en Internet
 
@@ -95,6 +115,8 @@ En la comprobación de solo lectura del 20-10-2026, el sitio cargó y pidió con
 - `QA/casos-prueba/`: matriz de pruebas manuales y seguimiento de resultados.
 - `QA/evidencias/`: capturas y resultados de ejecución.
 - `equipo/`: integrantes y responsabilidades.
+- `docs/equipo/`: responsabilidades resumidas y acuerdos de trabajo propuestos para revisión.
+- `CONTRIBUTING.md`, `CHANGELOG.md` y `SECURITY.md`: reglas para colaborar, registrar cambios y reportar problemas.
 
 ## Condición para declarar el proyecto listo
 
@@ -105,4 +127,18 @@ No marcar el proyecto como aprobado hasta que el equipo haya ejecutado las prueb
 
 Se compiló la aplicación y se ejecutó un recorrido HTTP local con una base SQLite temporal: inicio inicial, permisos muestreados por rol, compra, ventas en efectivo/QR, rechazo por stock, caja, reporte y recuperación de datos tras reiniciar. El detalle está en [E-05](QA/evidencias/qa-runtime-2026-10-20.md); las capturas de interfaz anonimizadas también están en [evidencias](QA/evidencias/README.md). Esto no valida el servicio público de Render ni sustituye la ejecución formal de todos los casos TC-01–TC-13.
 
-La revisión del documento fuente identificó descripciones técnicas contradictorias entre versiones de escritorio C++/Java y web C#/ASP.NET Core; ver [nota de seguimiento del Gantt y documentos](docs/gantt/seguimiento.md). El equipo debe resolverlo antes de declarar la madurez aprobada.
+El documento académico original conserva referencias históricas contradictorias a tecnologías de escritorio. La implementación actual del repositorio es la aplicación web C# con ASP.NET Core/Blazor descrita arriba; el equipo debe mantener alineados la presentación y los documentos de entrega con esta versión. Ver [nota de seguimiento del Gantt y documentos](docs/gantt/seguimiento.md).
+
+## Documentación del estándar del repositorio
+
+- [Visión y alcance](docs/proyecto/ALCANCE_OBJETIVOS_CRITERIOS.md)
+- [Requisitos funcionales y no funcionales](docs/requisitos.md)
+- [Arquitectura](docs/arquitectura.md)
+- [Modelo de datos](docs/modelo-de-datos.md)
+- [Planificación e hitos](docs/planificacion/planificacion.md)
+- [Seguimiento del Gantt original](docs/gantt/seguimiento.md)
+- [Acuerdos de trabajo propuestos](docs/equipo/acuerdos-de-trabajo.md)
+
+## Licencia
+
+El equipo aún debe decidir y registrar los términos de licencia. Mientras tanto, no se debe asumir que el código puede reutilizarse o redistribuirse; ver [`LICENSE`](LICENSE).
