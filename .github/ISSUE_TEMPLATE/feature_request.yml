@@ -1,0 +1,24 @@
+name: Proponer una mejora
+description: Describir una necesidad y su valor para el MVP.
+title: "feature: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Necesidad
+      description: ¿Qué necesidad concreta del usuario se busca resolver?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Propuesta y resultado esperado
+    validations:
+      required: true
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Relación con el alcance
+      options:
+        - label: Está dentro del alcance documentado del MVP.
+        - label: Requiere que el equipo revise o amplíe el alcance.

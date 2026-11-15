@@ -1,0 +1,32 @@
+name: Reportar un error
+description: Registrar un comportamiento reproducible del proyecto.
+title: "bug: "
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Descripción
+      description: Explica qué ocurrió y qué esperabas que ocurriera.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducir
+      placeholder: "1. ...\n2. ..."
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Entorno y versión
+      placeholder: Local o Render; sistema operativo; commit si se conoce
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidencia sin datos sensibles
+      description: No adjuntes contraseñas, tokens, datos personales ni bases de datos reales.
+    validations:
+      required: false

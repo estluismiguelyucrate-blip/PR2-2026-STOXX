@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Reporte de vulnerabilidad
+    url: https://github.com/estluismiguelyucrate-blip/PR2-2026-STOXX/security/advisories/new
+    about: Usa el aviso privado de seguridad y no publiques vulnerabilidades como Issues.

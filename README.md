@@ -1,108 +1,99 @@
-# PR2-2026-STOXX
+# STOXX
 
-Aplicación web académica para registrar ventas, controlar inventario y consultar cierres de caja de un pequeño comercio.
+Aplicación web académica para registrar ventas, controlar inventario y consultar cierres de caja de pequeños comercios.
 
-## Aplicación publicada
+## Estado
 
-**Abrir la aplicación web:** [https://stocks-con-3x.onrender.com/](https://stocks-con-3x.onrender.com/)
+- **Proyecto:** PR2-2026-STOXX.
+- **Tipo:** MVP académico en desarrollo y validación.
+- **Aplicación publicada:** [stocks-con-3x.onrender.com](https://stocks-con-3x.onrender.com/). La disponibilidad y la configuración de la cuenta administradora deben verificarse antes de cada demostración.
+- **Estado de calidad:** hay pruebas automatizadas y recorridos locales documentados; los casos manuales pendientes se mantienen como pendientes en la [matriz de QA](QA/casos-prueba/MATRIZ_PRUEBAS_MVP.md).
 
-## Estado de madurez del proyecto
+## Propósito y alcance
 
-Se incorporó una carpeta de documentación para organizar los criterios de aprobación. Los documentos describen qué debe comprobarse y dónde guardar las evidencias. **La existencia de estos documentos no significa que las pruebas técnicas ya estén aprobadas**: el equipo debe ejecutar cada caso y registrar el resultado real.
+STOXX reúne el catálogo, ventas, inventario, compras, caja y reportes diarios para reducir errores al registrar operaciones de un pequeño comercio. Está dirigido a administradores, cajeros y responsables de inventario. El MVP no valida pagos QR con un banco, no emite facturas fiscales y no integra sistemas contables externos.
 
-- [Lista de cierre para el cuestionario de madurez](docs/proyecto/PLAN_CIERRE_MADUREZ.md)
-- [Objetivos, alcance y criterios de aceptación](docs/proyecto/ALCANCE_OBJETIVOS_CRITERIOS.md)
-- [Cronograma de cierre de brechas](docs/planificacion/CRONOGRAMA_MADUREZ.md)
-- [Cronograma editable para Excel (CSV)](docs/planificacion/CRONOGRAMA_MADUREZ.csv)
-- [Responsabilidades y matriz de riesgos](docs/gestion/RIESGOS_Y_RESPONSABILIDADES.md)
-- [Matriz de pruebas del MVP](QA/casos-prueba/MATRIZ_PRUEBAS_MVP.md)
-- [Flujo de compilación y pruebas automáticas](.github/workflows/dotnet-ci.yml)
-- [Cómo guardar las evidencias](QA/evidencias/README.md)
+Las [metas, usuarios, límites y criterios de aceptación](docs/proyecto/ALCANCE_OBJETIVOS_CRITERIOS.md) y los [requisitos verificables](docs/requisitos.md) describen el alcance acordado para revisión del equipo.
 
-## Problema y propósito
+## Equipo
 
-El proyecto busca ayudar a pequeños comercios a registrar ventas y existencias en un mismo sistema. Cuando las ventas y el inventario se anotan por separado, pueden aparecer diferencias de stock, dificultades para planificar compras y errores al cuadrar la caja.
+- **Luis Miguel Yucra Terrazas:** desarrollo principal.
+- **Magdiel Siomn Grandidier Alegria:** QA y documentación.
+- **Heydam Matias Cespedes Hurtado:** análisis y base de datos.
 
-El sistema reúne ventas, inventario, proveedores, compras y reportes para facilitar esos registros. Está pensado para propietarios o administradores, vendedores o cajeros y responsables de inventario.
+El detalle de responsabilidades está en [documentación del equipo](docs/equipo/integrantes-y-roles.md).
 
-## Qué incluye esta versión
+## Funcionalidades principales
 
-- Inicio de sesión y cuentas con roles de administrador, cajero e inventario.
-- Configuración inicial para crear la primera cuenta administradora.
-- Catálogo de productos, precios, existencias y umbrales de stock mínimo.
-- Registro de ventas en efectivo o QR con descuento de existencias y control de stock insuficiente.
-- Apertura y cierre de caja, con cálculo del efectivo esperado y diferencia frente al conteo.
-- Registro de proveedores y compras recibidas que actualizan el inventario.
-- Resumen diario, alertas de stock bajo, totales por forma de pago, costo de mercancía, ganancia bruta y productos vendidos.
-- Base de datos SQLite. El catálogo empieza vacío para que el equipo introduzca datos de demostración.
+- Configuración de la primera cuenta administradora, inicio de sesión y roles.
+- Catálogo de productos, precios, existencias y stock mínimo.
+- Registro de ventas en efectivo o QR con control de stock.
+- Apertura y cierre de caja, incluyendo efectivo esperado y diferencia.
+- Registro de proveedores y compras recibidas que aumentan el inventario.
+- Resumen diario, alertas de stock bajo y totales por forma de pago.
+- Persistencia en SQLite.
 
-## Tecnologías
+## Tecnologías y requisitos
 
-La aplicación utiliza C# con ASP.NET Core y Blazor Server para la interfaz y la lógica. SQLite guarda los datos.
+- C# y ASP.NET Core 10 con componentes Blazor Server.
+- .NET SDK 10 para desarrollo y pruebas.
+- SQLite mediante Entity Framework Core.
+- Docker para la publicación configurada en Render.
 
-## Requisitos y ejecución local
+No se necesita instalar SQLite por separado. En el primer inicio, la aplicación crea el directorio de datos y la base de datos.
 
-- .NET SDK 10.
-- Windows, macOS o Linux con soporte para ASP.NET Core.
-- Conexión a Internet la primera vez para restaurar el paquete de SQLite.
+## Ejecución local
 
-Desde la raíz del repositorio, ejecuta:
+1. Instala el [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0).
+2. Clona el repositorio y abre una terminal en su raíz.
+3. Ejecuta:
+
+   ```powershell
+   dotnet run --project src/Stoxx.Web/Stoxx.Web.csproj --urls http://localhost:5080
+   ```
+
+4. Abre [http://localhost:5080](http://localhost:5080). En una base vacía, completa el flujo de configuración inicial de la cuenta administradora.
+
+Por defecto, los archivos locales se crean en `src/Stoxx.Web/data/`. Para usar otra ubicación, configura `STOXX_DATA_DIR` antes de iniciar la aplicación. No agregues contraseñas, tokens ni datos reales al repositorio. Usa información ficticia para desarrollo y demostraciones.
+
+### Pruebas
+
+Ejecuta la suite de pruebas automatizadas desde la raíz:
 
 ```powershell
-dotnet run --project src/Stoxx.Web/Stoxx.Web.csproj
+dotnet test tests/Stoxx.Web.Tests/Stoxx.Web.Tests.csproj --configuration Release
 ```
 
-Abre [http://localhost:5080](http://localhost:5080). En el primer inicio, sigue el flujo de creación de la cuenta administradora. Después agrega productos y proveedores de prueba. No uses datos personales ni financieros reales.
+La matriz de [pruebas manuales](QA/casos-prueba/MATRIZ_PRUEBAS_MVP.md) indica cómo registrar fecha, entorno, responsable, versión y evidencia. No marques como aprobada una prueba que no se haya ejecutado.
 
-## Publicación en Internet
+## Documentación
 
-El repositorio incluye `Dockerfile` y `render.yaml` para el despliegue en Render con almacenamiento persistente. La URL publicada es [https://stocks-con-3x.onrender.com/](https://stocks-con-3x.onrender.com/). El equipo debe verificar que cargue y que las operaciones de prueba se conserven después de reiniciar el servicio.
+- [Índice de documentación](docs/README.md): guía de ubicación de alcance, requisitos, arquitectura, datos, planificación, diagramas, manuales y equipo.
+- [Arquitectura](docs/arquitectura.md), [modelo de datos](docs/modelo-de-datos.md) y [manual de ejecución local](docs/manuales/instalacion-y-ejecucion.md).
+- [Criterios de cierre y madurez](docs/proyecto/PLAN_CIERRE_MADUREZ.md).
+- [Planificación y cronograma de cierre](docs/planificacion/CRONOGRAMA_MADUREZ.md) y [seguimiento del Gantt](docs/gantt/seguimiento.md).
+- [Responsabilidades y riesgos](docs/gestion/RIESGOS_Y_RESPONSABILIDADES.md).
+- [Matriz de pruebas](QA/casos-prueba/MATRIZ_PRUEBAS_MVP.md) y [cómo guardar evidencias](QA/evidencias/README.md).
+- [Documento del proyecto](docs/proyecto/Proyecto_Programa_Unido_con_Gantt_actualizado.pdf), [presentación](docs/presentacion/Presentacion-actualizada-v2.pptx) y [Gantt editable](docs/gantt/Diagrama_Gantt_tabla.xlsx). Se conservaron las fuentes originales; consulta la nota sobre discrepancias técnicas en el [plan de cierre](docs/proyecto/PLAN_CIERRE_MADUREZ.md).
 
-En la comprobación de solo lectura del 20-10-2026, el sitio cargó y pidió configurar el primer administrador (`setupRequired: true`). No se creó una cuenta en el servicio. El administrador designado debe completar esta configuración y el equipo debe comprobar el cierre de la ruta inicial antes de presentar el sistema como configurado. Ver [E-06](QA/evidencias/E-06-render-acceso-2026-10-20.md).
+## Estructura del repositorio
 
-## Flujo de demostración de extremo a extremo
+```text
+.
+├── .github/                 # CI, plantillas y propiedad de código
+├── docs/                    # Documentación del producto, arquitectura y equipo
+├── equipo/                  # Registro fuente de integrantes y responsabilidades
+├── QA/                      # Casos de prueba y evidencias reales
+├── src/Stoxx.Web/           # Aplicación ASP.NET Core
+├── tests/Stoxx.Web.Tests/   # Pruebas automatizadas
+├── Dockerfile               # Imagen para despliegue
+└── render.yaml              # Configuración de Render
+```
 
-1. Inicia la aplicación y configura la cuenta administradora inicial.
-2. Registra productos con costo, precio, cantidad inicial y stock mínimo.
-3. Registra un proveedor y una compra recibida.
-4. Abre la caja con un monto inicial.
-5. Registra una venta y verifica que se descuente el inventario.
-6. Comprueba que un usuario sin permisos no pueda entrar en funciones restringidas.
-7. Consulta alertas y reporte diario; cierra la caja con el efectivo contado.
-8. Reinicia la aplicación y verifica la persistencia de productos, ventas y movimientos.
-9. Guarda capturas y anota el resultado real de cada prueba en la matriz de QA.
+## Contribución
 
-## Documentos originales del equipo
+Lee [CONTRIBUTING.md](CONTRIBUTING.md) antes de proponer cambios. Los cambios se revisan mediante pull request; el flujo de integración continua compila y ejecuta la suite de pruebas para cambios dirigidos a `main`.
 
-- [Documento del proyecto original (PDF, conservado)](docs/proyecto/Proyecto_Programa_Unido_con_Gantt.pdf)
-- [Documento del proyecto con nota técnica actualizada](docs/proyecto/Proyecto_Programa_Unido_con_Gantt_actualizado.pdf)
-- [Presentación original (PPTX, conservada)](docs/presentacion/Presentacion.pptx)
-- [Presentación actualizada para la arquitectura C# y el estado de Render](docs/presentacion/Presentacion-actualizada-v2.pptx)
-- [Gantt editable (XLSX)](docs/gantt/Diagrama_Gantt_tabla.xlsx)
-- [Diagrama de Gantt (PNG)](docs/gantt/Diagrama_Gantt.png)
-- [Responsabilidades existentes del equipo](equipo/)
+## Seguridad y licencia
 
-## Estructura principal
-
-- `src/Stoxx.Web/`: aplicación ASP.NET Core, interfaz y persistencia.
-- `docs/proyecto/`: documento base, objetivos y alcance.
-- `docs/planificacion/`: planificación y tareas pendientes.
-- `docs/gestion/`: responsables y riesgos.
-- `docs/presentacion/`: presentación del equipo.
-- `docs/gantt/`: cronograma original.
-- `.github/workflows/dotnet-ci.yml`: compilación y pruebas automáticas en GitHub Actions.
-- `tests/Stoxx.Web.Tests/`: pruebas de integración de salud, configuración inicial, autenticación y permisos.
-- `QA/casos-prueba/`: matriz de pruebas manuales y seguimiento de resultados.
-- `QA/evidencias/`: capturas y resultados de ejecución.
-- `equipo/`: integrantes y responsabilidades.
-
-## Condición para declarar el proyecto listo
-
-No marcar el proyecto como aprobado hasta que el equipo haya ejecutado las pruebas críticas, registrado resultados y adjuntado evidencias reales. Las fechas y responsables del cronograma deben revisarse y confirmarse por el equipo.
-
-
-## Resultados locales de la revisión del 20-10-2026
-
-Se compiló la aplicación y se ejecutó un recorrido HTTP local con una base SQLite temporal: inicio inicial, permisos muestreados por rol, compra, ventas en efectivo/QR, rechazo por stock, caja, reporte y recuperación de datos tras reiniciar. El detalle está en [E-05](QA/evidencias/qa-runtime-2026-10-20.md); las capturas de interfaz anonimizadas también están en [evidencias](QA/evidencias/README.md). Esto no valida el servicio público de Render ni sustituye la ejecución formal de todos los casos TC-01–TC-13.
-
-La revisión del documento fuente identificó descripciones técnicas contradictorias entre versiones de escritorio C++/Java y web C#/ASP.NET Core; ver [nota de seguimiento del Gantt y documentos](docs/gantt/seguimiento.md). El equipo debe resolverlo antes de declarar la madurez aprobada.
+Consulta [SECURITY.md](SECURITY.md) para reportar vulnerabilidades. La licencia del proyecto todavía debe ser seleccionada y aprobada por el equipo; revisa [LICENSE](LICENSE) antes de reutilizar o distribuir el código.
