@@ -1,0 +1,39 @@
+name: Reportar un error
+description: Registrar un comportamiento que no coincide con lo esperado.
+title: "bug: "
+labels: [bug]
+body:
+  - type: textarea
+    id: observed
+    attributes:
+      label: Comportamiento observado
+      description: Explica qué ocurrió usando datos ficticios.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamiento esperado
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Pasos para reproducir
+      placeholder: "1. ..."
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Entorno y commit
+      description: Local o Render; incluye el hash corto si está disponible.
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacidad
+      options:
+        - label: No incluí contraseñas, tokens, datos personales ni datos financieros reales.
+          required: true
