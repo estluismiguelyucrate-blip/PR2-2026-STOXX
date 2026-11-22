@@ -102,7 +102,7 @@ La matriz de [pruebas manuales](QA/casos-prueba/MATRIZ_PRUEBAS_MVP.md) indica c�
 
 - [Índice de documentación](docs/README.md): guía de ubicación de alcance, requisitos, arquitectura, datos, planificación, diagramas, manuales y equipo.
 - [Arquitectura](docs/arquitectura.md), [modelo de datos](docs/modelo-de-datos.md) y [manual de ejecución local](docs/manuales/instalacion-y-ejecucion.md).
-- [Guía para exponer STOXX](docs/guia-exposicion.md): resumen del proyecto, recorrido por el código, ejecución local y guion de presentación.
+- [Vista previa visual de STOXX](https://github.com/estluismiguelyucrate-blip/pruebas): maqueta sin datos para revisar el diseño. La aplicación completa está en este repositorio; la maqueta no está desplegada como servidor.
 - [Criterios de cierre y madurez](docs/proyecto/PLAN_CIERRE_MADUREZ.md).
 - [Planificación y cronograma de cierre](docs/planificacion/CRONOGRAMA_MADUREZ.md) y [seguimiento del Gantt](docs/gantt/seguimiento.md).
 - [Responsabilidades y riesgos](docs/gestion/RIESGOS_Y_RESPONSABILIDADES.md).
