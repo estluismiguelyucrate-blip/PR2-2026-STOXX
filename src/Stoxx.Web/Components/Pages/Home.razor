@@ -1,16 +1,16 @@
 @page "/"
 @inherits HomeBase
-<PageTitle>Stocks X X X | Ventas e inventario</PageTitle>
+<PageTitle>STOXX | Ventas e inventario</PageTitle>
 
 @if (!Ready)
 {
-    <main class="auth-shell"><section class="auth-card"><div class="brand-mark">S</div><p class="eyebrow">STOCKS X X X</p><h1>Conectando...</h1><p class="muted">Cargando el sistema de ventas e inventario.</p></section></main>
+    <main class="auth-shell"><section class="auth-card"><div class="brand-mark" aria-label="STOXX"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 31.5 19.2 22l6.1 5.8L38 14"/><path d="M27.8 14H38v10.2"/><path d="M10 37h28"/></svg></div><p class="eyebrow">STOXX · GESTIÓN COMERCIAL</p><h1>Conectando...</h1><p class="muted">Cargando el sistema de ventas e inventario.</p></section></main>
 }
 else if (CurrentUser is null)
 {
     <main class="auth-shell">
         <section class="auth-card">
-            <div class="brand-mark">S</div><p class="eyebrow">STOCKS X X X</p>
+            <div class="brand-mark" aria-label="STOXX"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 31.5 19.2 22l6.1 5.8L38 14"/><path d="M27.8 14H38v10.2"/><path d="M10 37h28"/></svg></div><p class="eyebrow">STOXX · GESTIÓN COMERCIAL</p>
             <h1>@(SetupRequired ? "Configura el acceso" : "Iniciar sesión")</h1>
             <p class="muted">@(SetupRequired ? "Crea la primera cuenta administradora." : "Ingresa con tu cuenta para administrar la tienda.")</p>
             @if (!string.IsNullOrWhiteSpace(Notice)) { <div class="alert @(IsError ? "error" : "success")" role="alert">@Notice</div> }
@@ -39,7 +39,7 @@ else
 {
     <div class="app-shell">
         <aside class="sidebar">
-            <a class="brand" href="/"><span class="brand-mark small">S</span><span>Stocks X X X<small>Ventas e inventario</small></span></a>
+            <a class="brand" href="/" aria-label="STOXX, inicio"><span class="brand-mark small" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M10 31.5 19.2 22l6.1 5.8L38 14"/><path d="M27.8 14H38v10.2"/><path d="M10 37h28"/></svg></span><span>STOXX<small>Ventas e inventario</small></span></a>
             <nav aria-label="Navegación principal">
                 <button class="nav-link @(View == "inicio" ? "active" : "")" @onclick="ShowDashboardAsync"><span>◫</span> Resumen</button>
                 @if (CanSell) { <button class="nav-link @(View == "ventas" ? "active" : "")" @onclick="ShowSalesAsync"><span>＋</span> Registrar venta</button> }
@@ -101,7 +101,7 @@ else
             {
                 <section><div class="welcome-row"><div><h2>Usuarios del sistema</h2><p class="muted">Crea cuentas para el personal autorizado.</p></div></div><div class="content-grid users-grid"><article class="panel form-panel"><div class="panel-heading"><div><p class="eyebrow">ACCESO</p><h3>Crear usuario</h3></div></div><form class="stack" @onsubmit="CreateUserAsync" @onsubmit:preventDefault="true"><label>Nombre completo<input @bind="UserForm.Name" maxlength="100" required /></label><label>Usuario<input @bind="UserForm.UserName" minlength="3" maxlength="40" required /></label><label>Contraseña<input @bind="UserForm.Password" type="password" minlength="10" required /></label><label>Rol<select @bind="UserForm.Role"><option value="Cajero">Cajero</option><option value="Inventario">Inventario</option><option value="Admin">Administrador</option></select></label><button class="button primary">Crear cuenta</button></form></article><article class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">EQUIPO</p><h3>Cuentas registradas</h3></div></div><div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Usuario</th><th>Rol</th></tr></thead><tbody>@foreach (var user in Users) { <tr><td>@user.Name</td><td>@user.UserName</td><td>@RoleLabel(user.Role)</td></tr> }</tbody></table></div></article></div></section>
             }
-            <footer class="page-foot">Stocks X X X · Sistema web de ventas e inventario</footer>
+            <footer class="page-foot">STOXX · Sistema web de ventas e inventario</footer>
         </main>
     </div>
 }

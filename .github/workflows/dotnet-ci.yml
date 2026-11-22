@@ -24,5 +24,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
+      - name: Compilar utilidad de migración a PostgreSQL
+        run: dotnet build tools/Stoxx.DataMigration/Stoxx.DataMigration.csproj --configuration Release
       - name: Restaurar, compilar y ejecutar pruebas
         run: dotnet test tests/Stoxx.Web.Tests/Stoxx.Web.Tests.csproj --configuration Release --verbosity normal

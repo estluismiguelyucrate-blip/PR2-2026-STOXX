@@ -6,7 +6,8 @@ Aplicación web académica para registrar ventas, controlar inventario y consult
 
 - **Proyecto:** PR2-2026-STOXX.
 - **Tipo:** MVP académico en desarrollo y validación.
-- **Aplicación publicada:** [stocks-con-3x.onrender.com](https://stocks-con-3x.onrender.com/). La disponibilidad y la configuración de la cuenta administradora deben verificarse antes de cada demostración.
+- **Aplicación actual:** [stocks-con-3x.onrender.com](https://stocks-con-3x.onrender.com/).
+- **Destino preparado:** Google Cloud Run para ASP.NET Core y Neon PostgreSQL para guardar datos fuera del contenedor. La publicación requiere configurar el proyecto y los secretos de Google Cloud.
 - **Estado de calidad:** hay pruebas automatizadas y recorridos locales documentados; los casos manuales pendientes se mantienen como pendientes en la [matriz de QA](QA/casos-prueba/MATRIZ_PRUEBAS_MVP.md).
 
 ## Propósito y alcance
@@ -31,16 +32,16 @@ El detalle de responsabilidades está en [documentación del equipo](docs/equipo
 - Apertura y cierre de caja, incluyendo efectivo esperado y diferencia.
 - Registro de proveedores y compras recibidas que aumentan el inventario.
 - Resumen diario, alertas de stock bajo y totales por forma de pago.
-- Persistencia en SQLite.
+- Persistencia local con SQLite y PostgreSQL administrado en el despliegue de Cloud Run.
 
-## Tecnologías y requisitos
+## Tecnologías
 
 - C# y ASP.NET Core 10 con componentes Blazor Server.
 - .NET SDK 10 para desarrollo y pruebas.
-- SQLite mediante Entity Framework Core.
-- Docker para la publicación configurada en Render.
+- SQLite y PostgreSQL mediante Entity Framework Core.
+- Docker para desplegar el servidor .NET en Google Cloud Run.
 
-No se necesita instalar SQLite por separado. En el primer inicio, la aplicación crea el directorio de datos y la base de datos.
+La ejecución local sigue usando SQLite. En Cloud Run, `DATABASE_URL` selecciona PostgreSQL y las claves de sesión también se guardan en esa base persistente.
 
 ## Ejecución local
 
@@ -54,7 +55,38 @@ No se necesita instalar SQLite por separado. En el primer inicio, la aplicación
 
 4. Abre [http://localhost:5080](http://localhost:5080). En una base vacía, completa el flujo de configuración inicial de la cuenta administradora.
 
-Por defecto, los archivos locales se crean en `src/Stoxx.Web/data/`. Para usar otra ubicación, configura `STOXX_DATA_DIR` antes de iniciar la aplicación. No agregues contraseñas, tokens ni datos reales al repositorio. Usa información ficticia para desarrollo y demostraciones.
+Por defecto, la base local se crea en `src/Stoxx.Web/data/`. Configura `STOXX_DATA_DIR` para usar otra carpeta. No agregues contraseñas, tokens, cadenas de conexión ni datos reales al repositorio.
+
+## Preparar Google Cloud Run
+
+Cloud Run admite aplicaciones .NET en contenedores. El `Dockerfile` ya escucha en el puerto 8080. La instancia escala a cero cuando está inactiva, así que la primera petición después de un periodo sin uso puede tardar un poco; los registros siguen en PostgreSQL y no se pierden cuando se reemplaza el contenedor.
+
+1. Crea un proyecto de Google Cloud, habilita facturación y crea una base PostgreSQL en Neon.
+2. En Secret Manager, guarda la URL de conexión como `stoxx-database-url`. Concede acceso de lectura a la identidad de servicio que usará Cloud Run.
+3. Si vas a conservar los registros de SQLite, exporta de forma segura el archivo original y ejecuta la utilidad de migración C# con `STOXX_SQLITE_PATH` y `DATABASE_URL` configuradas. La utilidad se detiene si la base de destino ya tiene datos.
+4. Desde la raíz del repositorio, despliega:
+
+   ```powershell
+   gcloud run deploy stoxx --source . --region us-central1 --allow-unauthenticated --port 8080 --timeout 3600 --max 1 --memory 1Gi --set-env-vars STOXX_REQUIRE_POSTGRES=true --set-secrets DATABASE_URL=stoxx-database-url:latest
+   ```
+
+5. Abre la URL que entrega Google Cloud, verifica `/api/health`, crea o usa la cuenta administradora y confirma que los datos continúan después de un nuevo despliegue.
+
+Cloud Run tiene una cuota gratuita mensual, pero requiere una cuenta de facturación y puede cobrar si se superan los límites o se mantiene una instancia caliente. Para reducir la espera al primer acceso se puede configurar una instancia mínima; esa instancia tiene costo incluso sin tráfico. Neon también aplica límites gratuitos de almacenamiento y cómputo. Revisa los consumos y configura alertas de presupuesto antes de uso real.
+
+### Migrar los datos existentes
+
+La utilidad `tools/Stoxx.DataMigration` copia usuarios y hashes de contraseñas, productos, proveedores, cajas, ventas, detalle de ventas y compras de SQLite a una base PostgreSQL vacía. Las claves de sesión se generan de nuevo; los usuarios podrán volver a iniciar sesión con sus contraseñas actuales.
+
+```powershell
+$env:STOXX_SQLITE_PATH = (Resolve-Path "src/Stoxx.Web/data/stoxx.db").Path
+$env:DATABASE_URL = Read-Host "Pega la conexión de PostgreSQL"
+dotnet run --project tools/Stoxx.DataMigration/Stoxx.DataMigration.csproj
+Remove-Item Env:DATABASE_URL
+Remove-Item Env:STOXX_SQLITE_PATH
+```
+
+Si la base está en el disco de Render, primero obtén una copia segura de ese archivo. Conserva Render y la copia de SQLite hasta validar conteos, inicio de sesión, ventas y reportes en Cloud Run. No subas la copia a Git.
 
 ### Pruebas
 
@@ -70,6 +102,7 @@ La matriz de [pruebas manuales](QA/casos-prueba/MATRIZ_PRUEBAS_MVP.md) indica c�
 
 - [Índice de documentación](docs/README.md): guía de ubicación de alcance, requisitos, arquitectura, datos, planificación, diagramas, manuales y equipo.
 - [Arquitectura](docs/arquitectura.md), [modelo de datos](docs/modelo-de-datos.md) y [manual de ejecución local](docs/manuales/instalacion-y-ejecucion.md).
+- [Guía para exponer STOXX](docs/guia-exposicion.md): resumen del proyecto, recorrido por el código, ejecución local y guion de presentación.
 - [Criterios de cierre y madurez](docs/proyecto/PLAN_CIERRE_MADUREZ.md).
 - [Planificación y cronograma de cierre](docs/planificacion/CRONOGRAMA_MADUREZ.md) y [seguimiento del Gantt](docs/gantt/seguimiento.md).
 - [Responsabilidades y riesgos](docs/gestion/RIESGOS_Y_RESPONSABILIDADES.md).

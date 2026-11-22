@@ -5,25 +5,43 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Stoxx.Web.Contracts;
 using Stoxx.Web.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-var dataDirectory = builder.Configuration["STOXX_DATA_DIR"];
-if (string.IsNullOrWhiteSpace(dataDirectory))
-    dataDirectory = Path.Combine(builder.Environment.ContentRootPath, "data");
-Directory.CreateDirectory(dataDirectory);
-var keyDirectory = Path.Combine(dataDirectory, "keys");
-Directory.CreateDirectory(keyDirectory);
-builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo(keyDirectory))
-    .SetApplicationName("Stoxx.Web");
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? $"Data Source={Path.Combine(dataDirectory, "stoxx.db")}";
+var postgresUrl = builder.Configuration["DATABASE_URL"];
+var postgresConnectionString = builder.Configuration.GetConnectionString("Postgres");
+var sqliteDirectory = builder.Configuration["STOXX_DATA_DIR"];
+if (string.IsNullOrWhiteSpace(sqliteDirectory))
+    sqliteDirectory = Path.Combine(builder.Environment.ContentRootPath, "data");
+Directory.CreateDirectory(sqliteDirectory);
+var usePostgres = !string.IsNullOrWhiteSpace(postgresUrl) || !string.IsNullOrWhiteSpace(postgresConnectionString);
+if (builder.Configuration.GetValue<bool>("STOXX_REQUIRE_POSTGRES") && !usePostgres)
+    throw new InvalidOperationException("Configura DATABASE_URL antes de iniciar STOXX en Cloud Run.");
+var connectionString = !string.IsNullOrWhiteSpace(postgresUrl)
+    ? BuildPostgresConnectionString(postgresUrl)
+    : postgresConnectionString ?? builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? $"Data Source={Path.Combine(sqliteDirectory, "stoxx.db")}";
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    if (usePostgres) options.UseNpgsql(connectionString);
+    else options.UseSqlite(connectionString);
+});
+var dataProtection = builder.Services.AddDataProtection().SetApplicationName("Stoxx.Web");
+if (usePostgres)
+{
+    dataProtection.PersistKeysToDbContext<AppDbContext>();
+}
+else
+{
+    var keyDirectory = Path.Combine(sqliteDirectory, "keys");
+    Directory.CreateDirectory(keyDirectory);
+    dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keyDirectory));
+}
 builder.Services.AddScoped<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -509,7 +527,11 @@ app.MapGet("/api/reports/daily", async ([FromQuery] DateOnly? date, AppDbContext
     });
 }).RequireAuthorization(policy => policy.RequireRole(Roles.Admin, Roles.Cashier));
 
-app.MapGet("/api/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
+app.MapGet("/api/health", async (AppDbContext db) =>
+    await db.Database.CanConnectAsync()
+        ? Results.Ok(new { status = "ok", database = usePostgres ? "postgresql" : "sqlite" })
+        : Results.Problem("La base de datos no está disponible.", statusCode: StatusCodes.Status503ServiceUnavailable))
+    .AllowAnonymous();
 
 app.MapRazorComponents<Stoxx.Web.Components.App>()
     .AddInteractiveServerRenderMode();
@@ -517,6 +539,28 @@ app.MapRazorComponents<Stoxx.Web.Components.App>()
 app.Run();
 
 static string NormalizeUserName(string value) => value.Trim().ToUpperInvariant();
+
+static string BuildPostgresConnectionString(string databaseUrl)
+{
+    if (!Uri.TryCreate(databaseUrl, UriKind.Absolute, out var uri) || uri.Scheme is not ("postgres" or "postgresql"))
+        throw new InvalidOperationException("DATABASE_URL debe ser una dirección postgresql:// válida.");
+    var userInfo = uri.UserInfo.Split(':', 2);
+    if (userInfo.Length != 2 || string.IsNullOrWhiteSpace(uri.AbsolutePath.Trim('/')))
+        throw new InvalidOperationException("DATABASE_URL debe incluir usuario, contraseña y nombre de base.");
+    var builder = new NpgsqlConnectionStringBuilder
+    {
+        Host = uri.Host,
+        Port = uri.IsDefaultPort ? 5432 : uri.Port,
+        Database = Uri.UnescapeDataString(uri.AbsolutePath.Trim('/')),
+        Username = Uri.UnescapeDataString(userInfo[0]),
+        Password = Uri.UnescapeDataString(userInfo[1]),
+        SslMode = SslMode.Require,
+        Timeout = 15,
+        CommandTimeout = 30,
+        MaxPoolSize = 10
+    };
+    return builder.ConnectionString;
+}
 
 static string? ValidateCredentials(string name, string userName, string password)
 {
