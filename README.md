@@ -8,7 +8,7 @@ Aplicación web académica para registrar ventas, controlar inventario y consult
 - **Tipo:** MVP académico en desarrollo y validación.
 - **Servidor de destino:** Google Cloud Run para ASP.NET Core con Neon PostgreSQL para conservar los datos fuera del contenedor.
 - **URL pública del nuevo servidor:** pendiente de publicación. El código y las instrucciones están preparados, pero todavía falta configurar el proyecto de Google Cloud, la base PostgreSQL y sus secretos; no hay una dirección nueva que se pueda compartir aún.
-- **Estado de calidad:** hay pruebas automatizadas y recorridos locales documentados; los casos manuales pendientes se mantienen como pendientes en la [matriz de QA](QA/casos-prueba/MATRIZ_PRUEBAS_MVP.md).
+- **Estado de calidad:** la compilación Release y las 5 pruebas automatizadas pasan (evidencia [E-08](QA/evidencias/E-08-pruebas-automatizadas-2026-11-22.md)); las 12 pruebas manuales y la validación del nuevo servidor siguen pendientes en la [matriz de QA](QA/casos-prueba/MATRIZ_PRUEBAS_MVP.md).
 
 ## Propósito y alcance
 
