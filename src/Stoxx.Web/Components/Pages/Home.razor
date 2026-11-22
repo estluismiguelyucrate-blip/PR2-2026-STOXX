@@ -57,7 +57,33 @@ else
             @if (View == "inicio")
             {
                 <section>
-                    <div class="welcome-row"><div><h2>Resumen del día</h2><p class="muted">@TodayLabel</p></div><button class="button secondary" @onclick="LoadDashboardAsync">Actualizar</button></div>
+                    <div class="dashboard-hero">
+                        <div class="hero-main">
+                            <p class="eyebrow">TU NEGOCIO · @TodayLabel</p>
+                            <h2>@Greeting, @FirstName</h2>
+                            <p>Ventas, caja e inventario en un solo lugar. Aquí tienes el pulso de tu tienda para empezar la jornada.</p>
+                            <div class="hero-actions">
+                                @if (CanSell) { <button class="button primary" @onclick="ShowSalesAsync"><span aria-hidden="true">＋</span> Registrar venta</button> }
+                                @if (CanInventory) { <button class="button secondary" @onclick="ShowProductsAsync"><span aria-hidden="true">▦</span> Ver inventario</button> }
+                                <button class="button quiet" @onclick="LoadDashboardAsync">Actualizar datos</button>
+                            </div>
+                        </div>
+                        <aside class="hero-status">
+                            <div class="hero-status-top"><span class="eyebrow">ESTADO DE CAJA</span><span class="pill @(Cash?.Open == true ? "good" : "warn")">@(Cash?.Open == true ? "Abierta" : "Cerrada")</span></div>
+                            @if (Cash?.Open == true)
+                            {
+                                <strong>@Money(Cash.ExpectedCash)</strong>
+                                <span class="hero-status-caption">Efectivo esperado</span>
+                                <span class="hero-status-foot">Monto inicial: @Money(Cash.OpeningAmount)</span>
+                            }
+                            else
+                            {
+                                <strong>Lista para abrir</strong>
+                                <span class="hero-status-caption">Registra el monto inicial desde el panel de caja.</span>
+                            }
+                            <span class="hero-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M10 31.5 19.2 22l6.1 5.8L38 14"/><path d="M27.8 14H38v10.2"/><path d="M10 37h28"/></svg></span>
+                        </aside>
+                    </div>
                     <div class="metric-grid"><article class="metric-card"><span>Ventas de hoy</span><strong>@Money(Dashboard?.SalesTotal ?? 0)</strong><small>@(Dashboard?.SalesCount ?? 0) ventas</small></article><article class="metric-card"><span>Ganancia bruta estimada</span><strong>@Money(Dashboard?.GrossProfit ?? 0)</strong><small>Precio de venta menos costo registrado</small></article><article class="metric-card"><span>Productos activos</span><strong>@(Dashboard?.ActiveProducts ?? 0)</strong><small>En el catálogo</small></article><article class="metric-card warning-metric"><span>Stock bajo</span><strong>@(Dashboard?.LowStockCount ?? 0)</strong><small>En o por debajo del mínimo</small></article></div>
                     <div class="content-grid dashboard-grid">
                         <article class="panel"><div class="panel-heading"><div><p class="eyebrow">CAJA</p><h3>@(Cash?.Open == true ? "Caja abierta" : "Caja cerrada")</h3></div><span class="pill @(Cash?.Open == true ? "good" : "")">@(Cash?.Open == true ? "Abierta" : "Cerrada")</span></div>

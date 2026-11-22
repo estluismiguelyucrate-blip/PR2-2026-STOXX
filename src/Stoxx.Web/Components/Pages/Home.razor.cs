@@ -32,6 +32,8 @@ public class HomeBase : ComponentBase
     protected string Initial => string.IsNullOrWhiteSpace(CurrentUser?.Name) ? "S" : CurrentUser.Name[..1].ToUpperInvariant();
     protected string RoleName => RoleLabel(CurrentUser?.Role ?? "");
     protected string TodayLabel => DateTime.Now.ToString("dddd, d 'de' MMMM 'de' yyyy", CultureInfo.GetCultureInfo("es-BO"));
+    protected string Greeting => DateTime.Now.Hour switch { < 12 => "Buenos días", < 19 => "Buenas tardes", _ => "Buenas noches" };
+    protected string FirstName => string.IsNullOrWhiteSpace(CurrentUser?.Name) ? "equipo" : CurrentUser.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0];
     protected decimal CartTotal => Cart.Sum(x => x.UnitPrice * x.Quantity);
     protected bool ProductMatches(ProductDto p) => p.Active && p.Stock > 0 && $"{p.Code} {p.Name}".Contains(SaleSearch, StringComparison.CurrentCultureIgnoreCase);
     protected bool ProductMatchesSearch(ProductDto p) => $"{p.Code} {p.Name} {p.Category}".Contains(ProductSearch, StringComparison.CurrentCultureIgnoreCase);
