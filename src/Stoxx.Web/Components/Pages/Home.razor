@@ -19,7 +19,7 @@ else if (CurrentUser is null)
                 <form class="stack" @onsubmit="CreateAdminAsync" @onsubmit:preventDefault="true">
                     <label>Nombre completo<input @bind="SetupName" maxlength="100" autocomplete="name" required /></label>
                     <label>Usuario<input @bind="SetupUserName" minlength="3" maxlength="40" autocomplete="username" required /></label>
-                    <label>Contraseña<input @bind="SetupPassword" type="password" minlength="10" autocomplete="new-password" required /></label>
+                    <label>Contraseña<input @bind="SetupPassword" type="password" minlength="10" maxlength="200" autocomplete="new-password" required /></label>
                     <p class="hint">Esta cuenta tendrá permisos de administrador. Luego podrás crear cuentas autorizadas.</p>
                     <button class="button primary" disabled="@Busy">Crear administrador</button>
                 </form>
@@ -28,7 +28,7 @@ else if (CurrentUser is null)
             {
                 <form class="stack" @onsubmit="LoginAsync" @onsubmit:preventDefault="true">
                     <label>Usuario<input @bind="LoginUserName" autocomplete="username" required /></label>
-                    <label>Contraseña<input @bind="LoginPassword" type="password" autocomplete="current-password" required /></label>
+                    <label>Contraseña<input @bind="LoginPassword" type="password" maxlength="200" autocomplete="current-password" required /></label>
                     <button class="button primary" disabled="@Busy">Entrar</button>
                 </form>
             }
@@ -99,7 +99,7 @@ else
             }
             else if (View == "usuarios")
             {
-                <section><div class="welcome-row"><div><h2>Usuarios del sistema</h2><p class="muted">Crea cuentas para el personal autorizado.</p></div></div><div class="content-grid users-grid"><article class="panel form-panel"><div class="panel-heading"><div><p class="eyebrow">ACCESO</p><h3>Crear usuario</h3></div></div><form class="stack" @onsubmit="CreateUserAsync" @onsubmit:preventDefault="true"><label>Nombre completo<input @bind="UserForm.Name" maxlength="100" required /></label><label>Usuario<input @bind="UserForm.UserName" minlength="3" maxlength="40" required /></label><label>Contraseña<input @bind="UserForm.Password" type="password" minlength="10" required /></label><label>Rol<select @bind="UserForm.Role"><option value="Cajero">Cajero</option><option value="Inventario">Inventario</option><option value="Admin">Administrador</option></select></label><button class="button primary">Crear cuenta</button></form></article><article class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">EQUIPO</p><h3>Cuentas registradas</h3></div></div><div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Usuario</th><th>Rol</th></tr></thead><tbody>@foreach (var user in Users) { <tr><td>@user.Name</td><td>@user.UserName</td><td>@RoleLabel(user.Role)</td></tr> }</tbody></table></div></article></div></section>
+                <section><div class="welcome-row"><div><h2>Usuarios del sistema</h2><p class="muted">Crea cuentas para el personal autorizado.</p></div></div><div class="content-grid users-grid"><article class="panel form-panel"><div class="panel-heading"><div><p class="eyebrow">ACCESO</p><h3>Crear usuario</h3></div></div><form class="stack" @onsubmit="CreateUserAsync" @onsubmit:preventDefault="true"><label>Nombre completo<input @bind="UserForm.Name" maxlength="100" required /></label><label>Usuario<input @bind="UserForm.UserName" minlength="3" maxlength="40" required /></label><label>Contraseña<input @bind="UserForm.Password" type="password" minlength="10" maxlength="200" required /></label><label>Rol<select @bind="UserForm.Role"><option value="Cajero">Cajero</option><option value="Inventario">Inventario</option><option value="Admin">Administrador</option></select></label><button class="button primary">Crear cuenta</button></form></article><article class="panel table-panel"><div class="panel-heading"><div><p class="eyebrow">EQUIPO</p><h3>Cuentas registradas</h3></div></div><div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Usuario</th><th>Rol</th></tr></thead><tbody>@foreach (var user in Users) { <tr><td>@user.Name</td><td>@user.UserName</td><td>@RoleLabel(user.Role)</td></tr> }</tbody></table></div></article></div></section>
             }
             <footer class="page-foot">Stocks X X X · Sistema web de ventas e inventario</footer>
         </main>

@@ -525,7 +525,7 @@ static string? ValidateCredentials(string name, string userName, string password
     if (string.IsNullOrWhiteSpace(userName) || userName.Trim().Length < 3 || userName.Trim().Length > 40)
         return "El usuario debe tener entre 3 y 40 caracteres.";
     if (string.IsNullOrEmpty(password) || password.Length < 10 || password.Length > 200)
-        return "La contraseña debe tener al menos 10 caracteres.";
+        return "La contraseña debe tener entre 10 y 200 caracteres.";
     return null;
 }
 
