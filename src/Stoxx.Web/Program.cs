@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Stoxx.Web;
 using Stoxx.Web.Contracts;
 using Stoxx.Web.Data;
 
@@ -135,11 +136,11 @@ app.MapPost("/api/auth/login", async (
     HttpContext context) =>
 {
     if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrEmpty(request.Password))
-        return Results.Unauthorized();
+        return Results.Json(new { message = "Usuario o contraseña incorrectos." }, statusCode: StatusCodes.Status401Unauthorized);
     var userName = NormalizeUserName(request.UserName);
     var user = await db.Users.SingleOrDefaultAsync(x => x.UserName == userName);
     if (user is null || hasher.VerifyHashedPassword(user, user.PasswordHash, request.Password) == PasswordVerificationResult.Failed)
-        return Results.Unauthorized();
+        return Results.Json(new { message = "Usuario o contraseña incorrectos." }, statusCode: StatusCodes.Status401Unauthorized);
 
     var claims = new[]
     {
@@ -312,6 +313,7 @@ app.MapGet("/api/cash", async (AppDbContext db) =>
 app.MapPost("/api/cash/open", async (OpenCashRequest request, AppDbContext db, ClaimsPrincipal user) =>
 {
     if (request.OpeningAmount < 0) return Results.BadRequest(new { message = "El monto inicial no puede ser negativo." });
+    if (!MoneyLimits.IsValid(request.OpeningAmount)) return Results.BadRequest(new { message = "El monto inicial debe tener como máximo dos decimales y no superar Bs 9.999.999.999,99." });
     if (await db.CashSessions.AnyAsync(x => x.ClosedAtUtc == null))
         return Results.Conflict(new { message = "Ya existe una caja abierta." });
     var session = new CashSession
@@ -327,6 +329,7 @@ app.MapPost("/api/cash/open", async (OpenCashRequest request, AppDbContext db, C
 app.MapPost("/api/cash/close", async (CloseCashRequest request, AppDbContext db, ClaimsPrincipal user) =>
 {
     if (request.CountedAmount < 0) return Results.BadRequest(new { message = "El monto contado no puede ser negativo." });
+    if (!MoneyLimits.IsValid(request.CountedAmount)) return Results.BadRequest(new { message = "El monto contado debe tener como máximo dos decimales y no superar Bs 9.999.999.999,99." });
     var session = await db.CashSessions.Where(x => x.ClosedAtUtc == null).OrderByDescending(x => x.OpenedAtUtc).FirstOrDefaultAsync();
     if (session is null) return Results.Conflict(new { message = "No hay una caja abierta." });
     var cashSales = await db.Sales.AsNoTracking()
@@ -377,6 +380,9 @@ app.MapPost("/api/sales", async (
     foreach (var product in products)
     {
         var quantity = quantities[product.Id];
+        var lineTotal = product.UnitPrice * quantity;
+        if (lineTotal > MoneyLimits.MaximumAmount - sale.Total)
+            return Results.BadRequest(new { message = "El total de la venta supera el máximo permitido." });
         product.Stock -= quantity;
         sale.Items.Add(new SaleItem
         {
@@ -386,7 +392,7 @@ app.MapPost("/api/sales", async (
             UnitPrice = product.UnitPrice,
             UnitCost = product.CostPrice
         });
-        sale.Total += product.UnitPrice * quantity;
+        sale.Total += lineTotal;
     }
     sale.Total = decimal.Round(sale.Total, 2);
     db.Sales.Add(sale);
@@ -416,6 +422,8 @@ app.MapPost("/api/purchases", async (
 {
     if (request.Quantity <= 0 || request.UnitCost < 0)
         return Results.BadRequest(new { message = "La cantidad debe ser positiva y el costo no puede ser negativo." });
+    if (!MoneyLimits.IsValid(request.UnitCost))
+        return Results.BadRequest(new { message = "El costo debe tener como máximo dos decimales y no superar Bs 9.999.999.999,99." });
     var supplier = await db.Suppliers.SingleOrDefaultAsync(x => x.Id == request.SupplierId && x.Active);
     var product = await db.Products.SingleOrDefaultAsync(x => x.Id == request.ProductId && x.Active);
     if (supplier is null) return Results.BadRequest(new { message = "Selecciona un proveedor activo." });
@@ -423,13 +431,15 @@ app.MapPost("/api/purchases", async (
     if ((long)product.Stock + request.Quantity > int.MaxValue)
         return Results.BadRequest(new { message = "La cantidad excede el límite permitido." });
 
-    var unitCost = decimal.Round(request.UnitCost, 2);
+    var unitCost = request.UnitCost;
+    if (unitCost > MoneyLimits.MaximumAmount / request.Quantity)
+        return Results.BadRequest(new { message = "El costo total de la compra supera el máximo permitido." });
     var purchase = new Purchase
     {
         SupplierId = supplier.Id, SupplierName = supplier.Name,
         ProductId = product.Id, ProductName = product.Name,
         Quantity = request.Quantity, UnitCost = unitCost,
-        TotalCost = decimal.Round(unitCost * request.Quantity, 2),
+        TotalCost = unitCost * request.Quantity,
         RecordedBy = user.Identity?.Name ?? ""
     };
     product.Stock += request.Quantity;
@@ -450,8 +460,8 @@ app.MapGet("/api/purchases", async (AppDbContext db, int limit = 100) =>
 
 app.MapGet("/api/dashboard", async (AppDbContext db) =>
 {
-    var today = DateOnly.FromDateTime(DateTime.Now);
-    var (startUtc, endUtc) = UtcRangeForLocalDay(today);
+    var today = BusinessTime.Today;
+    var (startUtc, endUtc) = BusinessTime.UtcRangeForDay(today);
     var sales = await db.Sales.AsNoTracking().Include(x => x.Items)
         .Where(x => x.CreatedAtUtc >= startUtc && x.CreatedAtUtc < endUtc).ToListAsync();
     var products = await db.Products.AsNoTracking().Where(x => x.Active).ToListAsync();
@@ -483,8 +493,8 @@ app.MapGet("/api/dashboard", async (AppDbContext db) =>
 
 app.MapGet("/api/reports/daily", async ([FromQuery] DateOnly? date, AppDbContext db) =>
 {
-    var day = date ?? DateOnly.FromDateTime(DateTime.Now);
-    var (startUtc, endUtc) = UtcRangeForLocalDay(day);
+    var day = date ?? BusinessTime.Today;
+    var (startUtc, endUtc) = BusinessTime.UtcRangeForDay(day);
     var sales = await db.Sales.AsNoTracking().Include(x => x.Items)
         .Where(x => x.CreatedAtUtc >= startUtc && x.CreatedAtUtc < endUtc).ToListAsync();
     var items = sales.SelectMany(x => x.Items).ToList();
@@ -525,7 +535,7 @@ static string? ValidateCredentials(string name, string userName, string password
     if (string.IsNullOrWhiteSpace(userName) || userName.Trim().Length < 3 || userName.Trim().Length > 40)
         return "El usuario debe tener entre 3 y 40 caracteres.";
     if (string.IsNullOrEmpty(password) || password.Length < 10 || password.Length > 200)
-        return "La contraseña debe tener al menos 10 caracteres.";
+        return "La contraseña debe tener entre 10 y 200 caracteres.";
     return null;
 }
 
@@ -539,15 +549,9 @@ static string? ValidateProduct(ProductRequest request)
         return "La categoría debe tener como máximo 100 caracteres.";
     if (request.CostPrice < 0 || request.UnitPrice <= 0 || request.Stock < 0 || request.MinimumStock < 0)
         return "El costo y el stock no pueden ser negativos; el precio de venta debe ser mayor que cero.";
-    if (decimal.Round(request.CostPrice, 2) != request.CostPrice || decimal.Round(request.UnitPrice, 2) != request.UnitPrice)
-        return "Los precios deben tener como máximo dos decimales.";
+    if (!MoneyLimits.IsValid(request.CostPrice) || !MoneyLimits.IsValid(request.UnitPrice))
+        return "Los precios deben tener como máximo dos decimales y no superar Bs 9.999.999.999,99.";
     return null;
-}
-
-static (DateTime StartUtc, DateTime EndUtc) UtcRangeForLocalDay(DateOnly day)
-{
-    var localStart = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.MinValue), DateTimeKind.Local);
-    return (localStart.ToUniversalTime(), localStart.AddDays(1).ToUniversalTime());
 }
 
 public partial class Program { }

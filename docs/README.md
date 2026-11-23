@@ -22,3 +22,9 @@ Esta carpeta conserva los documentos existentes y señala el archivo fuente de c
 - [Gantt editable](gantt/Diagrama_Gantt_tabla.xlsx) y [exportación PNG](gantt/Diagrama_Gantt.png).
 
 Las fuentes originales se conservan para trazabilidad. Si contradicen la aplicación implementada, consulta la nota técnica del [plan de cierre](proyecto/PLAN_CIERRE_MADUREZ.md) y el [seguimiento del Gantt](gantt/seguimiento.md).
+
+## Guías del repositorio
+
+- [Cómo contribuir](../CONTRIBUTING.md): flujo de ramas, comprobaciones y revisión por pull request.
+- [Política de seguridad](../SECURITY.md): cómo reportar vulnerabilidades.
+- [Historial de cambios](../CHANGELOG.md): cambios registrados por versión.

@@ -8,6 +8,8 @@
 
 SQLite se incorpora mediante el paquete del proyecto; no hace falta instalar un servidor de base de datos.
 
+Los días del resumen y de los reportes se calculan con la hora de Bolivia (UTC−4), sin depender de la zona horaria configurada en el servidor.
+
 ## Iniciar la aplicación
 
 Desde la raíz del repositorio:
