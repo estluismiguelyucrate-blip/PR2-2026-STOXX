@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Stoxx.Web;
 using Stoxx.Web.Contracts;
 using Stoxx.Web.Data;
 
@@ -450,8 +451,8 @@ app.MapGet("/api/purchases", async (AppDbContext db, int limit = 100) =>
 
 app.MapGet("/api/dashboard", async (AppDbContext db) =>
 {
-    var today = DateOnly.FromDateTime(DateTime.Now);
-    var (startUtc, endUtc) = UtcRangeForLocalDay(today);
+    var today = BusinessTime.Today;
+    var (startUtc, endUtc) = BusinessTime.UtcRangeForDay(today);
     var sales = await db.Sales.AsNoTracking().Include(x => x.Items)
         .Where(x => x.CreatedAtUtc >= startUtc && x.CreatedAtUtc < endUtc).ToListAsync();
     var products = await db.Products.AsNoTracking().Where(x => x.Active).ToListAsync();
@@ -483,8 +484,8 @@ app.MapGet("/api/dashboard", async (AppDbContext db) =>
 
 app.MapGet("/api/reports/daily", async ([FromQuery] DateOnly? date, AppDbContext db) =>
 {
-    var day = date ?? DateOnly.FromDateTime(DateTime.Now);
-    var (startUtc, endUtc) = UtcRangeForLocalDay(day);
+    var day = date ?? BusinessTime.Today;
+    var (startUtc, endUtc) = BusinessTime.UtcRangeForDay(day);
     var sales = await db.Sales.AsNoTracking().Include(x => x.Items)
         .Where(x => x.CreatedAtUtc >= startUtc && x.CreatedAtUtc < endUtc).ToListAsync();
     var items = sales.SelectMany(x => x.Items).ToList();
@@ -542,12 +543,6 @@ static string? ValidateProduct(ProductRequest request)
     if (decimal.Round(request.CostPrice, 2) != request.CostPrice || decimal.Round(request.UnitPrice, 2) != request.UnitPrice)
         return "Los precios deben tener como máximo dos decimales.";
     return null;
-}
-
-static (DateTime StartUtc, DateTime EndUtc) UtcRangeForLocalDay(DateOnly day)
-{
-    var localStart = DateTime.SpecifyKind(day.ToDateTime(TimeOnly.MinValue), DateTimeKind.Local);
-    return (localStart.ToUniversalTime(), localStart.AddDays(1).ToUniversalTime());
 }
 
 public partial class Program { }

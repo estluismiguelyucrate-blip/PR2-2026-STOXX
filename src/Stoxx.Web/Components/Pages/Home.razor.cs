@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Stoxx.Web.Contracts;
+using Stoxx.Web;
 
 namespace Stoxx.Web.Components.Pages;
 
@@ -10,7 +11,7 @@ public class HomeBase : ComponentBase
 {
     [Inject] protected IJSRuntime JS { get; set; } = default!;
     protected bool Ready, Busy, IsError, SetupRequired;
-    protected string Notice = "", View = "inicio", LoginUserName = "", LoginPassword = "", SetupName = "", SetupUserName = "", SetupPassword = "", SaleSearch = "", ProductSearch = "", PaymentMethod = "Efectivo", ReportDate = DateOnly.FromDateTime(DateTime.Now).ToString("yyyy-MM-dd");
+    protected string Notice = "", View = "inicio", LoginUserName = "", LoginPassword = "", SetupName = "", SetupUserName = "", SetupPassword = "", SaleSearch = "", ProductSearch = "", PaymentMethod = "Efectivo", ReportDate = BusinessTime.Today.ToString("yyyy-MM-dd");
     protected UserDto? CurrentUser;
     protected DashboardDto? Dashboard;
     protected CashDto? Cash;
@@ -31,7 +32,7 @@ public class HomeBase : ComponentBase
     protected string PageTitle => View switch { "ventas" => "Registrar venta", "productos" => "Productos", "compras" => "Compras y proveedores", "reportes" => "Reportes", "usuarios" => "Usuarios", _ => "Resumen" };
     protected string Initial => string.IsNullOrWhiteSpace(CurrentUser?.Name) ? "S" : CurrentUser.Name[..1].ToUpperInvariant();
     protected string RoleName => RoleLabel(CurrentUser?.Role ?? "");
-    protected string TodayLabel => DateTime.Now.ToString("dddd, d 'de' MMMM 'de' yyyy", CultureInfo.GetCultureInfo("es-BO"));
+    protected string TodayLabel => BusinessTime.Now.ToString("dddd, d 'de' MMMM 'de' yyyy", CultureInfo.GetCultureInfo("es-BO"));
     protected decimal CartTotal => Cart.Sum(x => x.UnitPrice * x.Quantity);
     protected bool ProductMatches(ProductDto p) => p.Active && p.Stock > 0 && $"{p.Code} {p.Name}".Contains(SaleSearch, StringComparison.CurrentCultureIgnoreCase);
     protected bool ProductMatchesSearch(ProductDto p) => $"{p.Code} {p.Name} {p.Category}".Contains(ProductSearch, StringComparison.CurrentCultureIgnoreCase);
@@ -77,11 +78,11 @@ public class HomeBase : ComponentBase
     protected async Task SaveSupplierAsync() => await Run(async () => { await Send<object>("/suppliers",HttpMethod.Post,new SupplierRequest(SupplierForm.Name,SupplierForm.ContactName,SupplierForm.Phone,SupplierForm.Email,SupplierForm.Notes)); SupplierForm = new(); await ShowPurchasesAsync(); });
     protected async Task ArchiveSupplierAsync(SupplierDto s) => await Run(async () => { await Send<object>($"/suppliers/{s.Id}",HttpMethod.Delete); await ShowPurchasesAsync(); });
     protected async Task SavePurchaseAsync() => await Run(async () => { await Send<object>("/purchases",HttpMethod.Post,new PurchaseRequest(PurchaseForm.SupplierId,PurchaseForm.ProductId,PurchaseForm.Quantity,PurchaseForm.UnitCost)); PurchaseForm = new(); await ShowPurchasesAsync(); });
-    protected async Task LoadReportAsync() { var day = string.IsNullOrWhiteSpace(ReportDate) ? DateOnly.FromDateTime(DateTime.Now).ToString("yyyy-MM-dd") : ReportDate; Report = await Get<ReportDto>($"/reports/daily?date={day}"); }
+    protected async Task LoadReportAsync() { var day = string.IsNullOrWhiteSpace(ReportDate) ? BusinessTime.Today.ToString("yyyy-MM-dd") : ReportDate; Report = await Get<ReportDto>($"/reports/daily?date={day}"); }
     protected async Task ReportDateChanged(ChangeEventArgs e) { ReportDate = e.Value?.ToString() ?? ""; await Run(LoadReportAsync); }
     protected async Task CreateUserAsync() => await Run(async () => { await Send<object>("/users",HttpMethod.Post,new CreateUserRequest(UserForm.Name,UserForm.UserName,UserForm.Password,UserForm.Role)); UserForm = new(); await ShowUsersAsync(); });
     protected static string Money(decimal value) => value.ToString("Bs #,##0.00", CultureInfo.GetCultureInfo("es-BO"));
-    protected static string ShortDate(DateTime value) => value.ToLocalTime().ToString("g");
+    protected static string ShortDate(DateTime value) => BusinessTime.ToLocal(value).ToString("g", CultureInfo.GetCultureInfo("es-BO"));
     protected static string RoleLabel(string role) => role switch { "Admin" => "Administrador", "Cajero" => "Cajero", "Inventario" => "Inventario", _ => role };
 }
 
