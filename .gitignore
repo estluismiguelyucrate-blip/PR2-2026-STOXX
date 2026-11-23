@@ -5,6 +5,8 @@ artifacts/
 TestResults/
 
 # Local application data and credentials
+**/data/
+**/Data/
 **/*.db
 **/*.db-shm
 **/*.db-wal
