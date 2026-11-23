@@ -136,11 +136,11 @@ app.MapPost("/api/auth/login", async (
     HttpContext context) =>
 {
     if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrEmpty(request.Password))
-        return Results.Unauthorized();
+        return Results.Json(new { message = "Usuario o contraseña incorrectos." }, statusCode: StatusCodes.Status401Unauthorized);
     var userName = NormalizeUserName(request.UserName);
     var user = await db.Users.SingleOrDefaultAsync(x => x.UserName == userName);
     if (user is null || hasher.VerifyHashedPassword(user, user.PasswordHash, request.Password) == PasswordVerificationResult.Failed)
-        return Results.Unauthorized();
+        return Results.Json(new { message = "Usuario o contraseña incorrectos." }, statusCode: StatusCodes.Status401Unauthorized);
 
     var claims = new[]
     {
